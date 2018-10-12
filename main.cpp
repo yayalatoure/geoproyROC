@@ -11,8 +11,9 @@
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/video/background_segm.hpp>
 #include <opencv/cv.h>
-//#include <QRect>
-//#include <QDir>
+#include <QRect>
+#include <QDir>
+#include <QPainter>
 
 using namespace std;
 using namespace cv;
@@ -20,8 +21,6 @@ using namespace cv;
 int main(int argc, char *argv[]){
 
     cv::Mat img_cal, img_test;
-
-    QApplication app( argc, argv );
 
     //// Images Directories
     string path_cal  = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/CALIBRACION01/*.jpg";
@@ -42,6 +41,10 @@ int main(int argc, char *argv[]){
     char ch = 0;
     foot Foot(false);
     geoproy geoproyTest(true);
+
+    geoproyTest.readCalibFile();
+    cout << geoproyTest.homography << "\n" << endl;
+
 
     while(ch != 'q' && ch != 'Q') {
 
@@ -69,7 +72,7 @@ int main(int argc, char *argv[]){
 
         if (Foot.frameAct.processFrame.data) {
 
-            geoproyTest.readCalibFile();
+
 
         }
 

@@ -6,23 +6,26 @@
 #define GEOPROYECTIVA_GEOPROYECTIVA_H
 
 
-//#include <fstream>
-//#include <iostream>
-//#include <string>
-//#include <QLabel>
-//#include <QMessageBox>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <QLabel>
+#include <QMessageBox>
 #include <QFileDialog>
 
 
+#include <opencv/cv.h>
 
-#include <opencv2/highgui/highgui.hpp>
+using namespace std;
+using namespace cv;
 
-class geoproy : public QWidget{
+
+class geoproy {
 
 public:
 
     //// Constructor ////
-    explicit  geoproy(bool start);
+    explicit geoproy(bool start);
 
     //// Read Calib File ////
     void readCalibFile();
@@ -31,6 +34,8 @@ public:
     //// Bool Atributes ////
     bool start;
 
+    //// Mat Atributes ////
+    Mat homography;
 
 
 

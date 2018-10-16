@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
     cv::Mat img_cal, img_test;
 
     //// Images Directories
-    string path_cal  = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/CALIBRACION01/*.jpg";
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/CAL_Test1/*.jpg";
     string path_test = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/TEST01/*.jpg";
 
     //// Video Original
@@ -43,8 +43,13 @@ int main(int argc, char *argv[]){
     geoproy geoproyTest(true);
 
     geoproyTest.readCalibFile();
+    geoproyTest.genCalibPoints();
+
+
     cout << geoproyTest.homography << "\n" << endl;
 
+
+    QImage edit;
 
     while(ch != 'q' && ch != 'Q') {
 
@@ -71,15 +76,22 @@ int main(int argc, char *argv[]){
         ///// Algoritmo /////
 
         if (Foot.frameAct.processFrame.data) {
-
-
-
+            if (count_cal < limit) {
+                Mat img = Foot.frameAct.processFrame.clone();
+                edit = QImage((uchar*) img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
+                geoproyTest.addCalibPoints(edit);
+            }
         }
 
 
         if (Foot.start && (Foot.frameAct.processFrame.data)) {
 
             cv::imshow("frameAct", Foot.frameAct.processFrame);
+
+            QLabel myLabel;
+            myLabel.setPixmap(QPixmap::fromImage(edit));
+            myLabel.show();
+
 
         }
 

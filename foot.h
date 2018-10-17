@@ -32,6 +32,7 @@ typedef struct {
 
     ////// Frames //////
     cv::Mat processFrame;
+    cv::Mat maskConvexPoly;
     cv::Mat segmentedFrame;
     cv::Mat resultFrame;
     cv::Mat templateFrameR;
@@ -119,6 +120,8 @@ public:
         //// Int Atributes ////
         int Right = 1;
         int Left = 2;
+        int rowsIm = 480;
+        int colsIm = 640;
 
         //// Bool Atributes ////
         bool start;

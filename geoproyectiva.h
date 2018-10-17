@@ -49,7 +49,7 @@ class geoproy {
         bool start;
         //// Mat Atributes ////
         Mat homography;
-        Mat maskConvexPoly;
+
         //// Points Vector Atributes ////
         std::map<int, cv::Point2f> calibPointsSuelo;
         std::map<int, cv::Point2f> calibPointsImage;

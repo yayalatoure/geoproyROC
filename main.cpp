@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 
     //// Images Directories
     string path_cal  = "/home/lalo/Desktop/Data_Videos/CAL_Test1/*.jpg";
-    string path_test = "/home/lalo/Desktop/Data_Videos/Player3/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/Player1/*.jpg";
 
     //// Video Original
     int count_test = 195+145, count_cal = 0, limit = 150-145;
@@ -51,9 +51,9 @@ int main(int argc, char *argv[]){
 
     geoproyTest.readCalibFile();
     geoproyTest.genCalibPointsSuelo();
-    geoproyTest.genCalibPointsImage();
     geoproyTest.genCalibPointsCorner();
 
+    Foot.maskConvexPoly(geoproyTest);
 
     cout << geoproyTest.homography << "\n" << endl;
 
@@ -88,15 +88,12 @@ int main(int argc, char *argv[]){
         if (Foot.frameAct.processFrame.data) {
 
             Foot.segmentation();
-            Foot.maskConvexPoly(geoproyTest);
 
 
             img = Foot.frameAct.processFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
             geoproyTest.addCalibPoints(edit);
             geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine()));
-
-
 
 
         }
@@ -110,17 +107,22 @@ int main(int argc, char *argv[]){
         if (Foot.start && (Foot.frameAct.processFrame.data)) {
 
             cv::imshow("frameAct", Foot.frameAct.processFrame);
-//            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
+            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
             cv::imshow("geoProy", geopro);
-            cv::imshow("segmConvexPoly", geoproyTest.maskConvexPoly);
+
 
 
 
         }
 
+        cout << "rows: " << Foot.frameAct.processFrame.rows << endl;
+        cout << "cols: " << Foot.frameAct.processFrame.cols << endl;
+
         count_cal++;
         count_test++;
         ch = char(cv::waitKey(0));
+
+
 
     }
 
@@ -145,8 +147,6 @@ int main(int argc, char *argv[]){
 
 
 
-
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 
 }

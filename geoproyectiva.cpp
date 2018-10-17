@@ -62,26 +62,7 @@ void geoproy::genCalibPointsSuelo() {
     p.x = step;  p.y = step;
     calibPointsSuelo[9] = p;
 
-}
-
-void geoproy::genCalibPointsCorner() {
-
-    calibPointsCornerSuelo.clear();
-    cv::Point2f p;
-    int step = 350;
-
-    p.x = -step; p.y = -step;
-    calibPointsCornerSuelo[1] = p;
-    p.x = -step; p.y = step;
-    calibPointsCornerSuelo[2] = p;
-    p.x = step;  p.y = -step;
-    calibPointsCornerSuelo[3] = p;
-    p.x = step; p.y = step;
-    calibPointsCornerSuelo[4] = p;
-
-    for (int i = 1; i <= 4; ++i) {
-        calibPointsCornerImage[i] = transform(calibPointsCornerSuelo[i], homography);
-    }
+    genCalibPointsImage();
 
 }
 
@@ -97,6 +78,29 @@ void geoproy::genCalibPointsImage(){
     }
 
 }
+
+void geoproy::genCalibPointsCorner() {
+
+    calibPointsCornerSuelo.clear();
+    cv::Point2f p;
+    int step = 350;
+
+    p.x = -step; p.y = -step;
+    calibPointsCornerSuelo[1] = p;
+    p.x = step; p.y = -step;
+    calibPointsCornerSuelo[2] = p;
+    p.x = step;  p.y = step;
+    calibPointsCornerSuelo[3] = p;
+    p.x = -step; p.y = step;
+    calibPointsCornerSuelo[4] = p;
+
+    for (int i = 1; i <= 4; ++i) {
+        calibPointsCornerImage[i] = transform(calibPointsCornerSuelo[i], homography);
+        roiConvexPoly.push_back(calibPointsCornerImage[i]);
+    }
+
+}
+
 
 cv::Point geoproy::transform(cv::Point2f p, cv::Mat &H) {
 
@@ -141,25 +145,22 @@ void geoproy::drawRectangleRed(QPainter &pnt, Point2f &p, cv::Mat &H){
 void geoproy::drawRectangleBlue(QPainter &pnt, cv::Mat &H){
 
     cv::Point point1, point2;
-    cv::Point p;
-    p.x = 0, p.y = 0;
-    int hside = 350;
     pnt.setPen(QColor(255,255,0));
 
-    point1 = transform(cv::Point2f(p.x-hside, p.y-hside), H);
-    point2 = transform(cv::Point2f(p.x+hside, p.y-hside), H);
+    point1 = calibPointsCornerImage[1];
+    point2 = calibPointsCornerImage[2];
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-//    point1 = transform(cv::Point2f(p.x+hside, p.y-hside), H);
-//    point2 = transform(cv::Point2f(p.x+hside, p.y+hside), H);
+    point1 = calibPointsCornerImage[2];
+    point2 = calibPointsCornerImage[3];
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-//    point1 = transform(cv::Point2f(p.x+hside, p.y+hside), H);
-//    point2 = transform(cv::Point2f(p.x-hside, p.y+hside), H);
+    point1 = calibPointsCornerImage[3];
+    point2 = calibPointsCornerImage[4];
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-//    point1 = transform(cv::Point2f(p.x-hside, p.y+hside), H);
-//    point2 = transform(cv::Point2f(p.x-hside, p.y-hside), H);
+    point1 = calibPointsCornerImage[4];
+    point2 = calibPointsCornerImage[1];
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
 }
@@ -167,7 +168,6 @@ void geoproy::drawRectangleBlue(QPainter &pnt, cv::Mat &H){
 void geoproy::addCalibPoints(QImage &image) {
 
     std::map<int, cv::Point2f>::iterator it1, it1_end = calibPointsSuelo.end();
-    std::map<int, cv::Point2f>::iterator it2, it2_end = calibPointsCorner.end();
     int index;
     QPoint p_im;
     QPainter pnt;

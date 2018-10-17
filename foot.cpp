@@ -102,22 +102,20 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
 }
 
 
-
+//// Convex Polygon Platform Mask ////
 void foot::maskConvexPoly(geoproy GeoProy){
 
-    Mat mask = Mat(frameAct.processFrame.rows, frameAct.processFrame.cols, CV_8UC1, Scalar(0));
+    Mat mask = Mat(rowsIm, colsIm, CV_8UC1, Scalar(0));
     approxPolyDP(GeoProy.roiConvexPoly, GeoProy.roiConvexPoly, 1.0, true);
     fillConvexPoly(mask, &GeoProy.roiConvexPoly[0], (int)GeoProy.roiConvexPoly.size(), 255, 8, 0);
-    GeoProy.maskConvexPoly = mask.clone();
+    frameAct.maskConvexPoly = mask.clone();
 
 }
-
-
 
 //// Segmentation and Foot Boxes ////
 void foot::segmentation(){
 
-    cv::Mat fg, labels, labels2, stats, centroids;
+    cv::Mat processMasked, foreGround, labels, labels2, stats, centroids;
 
     double backgroundRatio = 0.6;
     double learningRate = 0.003; ////0.005
@@ -125,20 +123,22 @@ void foot::segmentation(){
     int    nmixtures = 3;
     int    history = 200; ////150
 
-
     static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
     mog->setNMixtures(nmixtures);
     mog->setBackgroundRatio(backgroundRatio);
     mog->setShadowValue(0);
 
     //// Start Segmentation ////
-    mog->apply(frameAct.processFrame, fg, 2*learningRate);
+    //// Convex Polygon Mask ////
+    frameAct.processFrame.copyTo(processMasked, frameAct.maskConvexPoly);
 
-    cv::dilate(fg, fg, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 6))); ////(4,6)
-    cv::erode(fg, fg, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 5))); ////(4,6)
-    cv::connectedComponentsWithStats(fg, labels, stats, centroids, 8, CV_32S);
+    mog->apply(processMasked, foreGround, 2*learningRate);
 
-    frameAct.segmentedFrame  =  fg.clone();
+    cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 6))); ////(4,6)
+    cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 5))); ////(4,6)
+    cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 8, CV_32S);
+
+    frameAct.segmentedFrame  =  foreGround.clone();
     frameAct.labelsFrame = labels.clone();
     frameAct.labels2Frame = labels2.clone();
 

@@ -22,13 +22,15 @@
 #include <QRect>
 #include <QDir>
 
+#include "geoproyectiva.h"
+
+
 using namespace std;
 using namespace cv;
 
 typedef struct {
 
     ////// Frames //////
-
     cv::Mat processFrame;
     cv::Mat segmentedFrame;
     cv::Mat resultFrame;
@@ -44,7 +46,6 @@ typedef struct {
     cv::Mat matchScoreShowL;
 
     //// Segmentation Labels ////
-
     cv::Mat labelsFrame;
     cv::Mat labels2Frame;
 
@@ -63,6 +64,7 @@ class foot {
         explicit foot(bool start);
 
         //// Segmentation & ROI (footBoxes) ////
+        void maskConvexPoly(geoproy GeoProy);
         void segmentation();
         void findFootBoxes();
         void getBlobs(cv::Mat labels, std::map<int, cv::Rect> &bboxes);

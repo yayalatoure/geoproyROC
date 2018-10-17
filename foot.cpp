@@ -4,8 +4,8 @@
 
 #include "foot.h"
 
-//// CONSTRUCTOR ////
 
+//// CONSTRUCTOR ////
 foot::foot(bool start) {
     this -> start = true;
     Reset_R = false;
@@ -17,7 +17,6 @@ foot::foot(bool start) {
 
 
 //// COLORS ////
-
 cv::Scalar foot::cyan(255, 255, 0); // NOLINT
 cv::Scalar foot::green(0, 255, 0); // NOLINT
 cv::Scalar foot::ivory(240, 255, 255); // NOLINT
@@ -102,6 +101,19 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
 
 }
 
+
+
+void foot::maskConvexPoly(geoproy GeoProy){
+
+    Mat mask = Mat(frameAct.processFrame.rows, frameAct.processFrame.cols, CV_8UC1, Scalar(0));
+    approxPolyDP(GeoProy.roiConvexPoly, GeoProy.roiConvexPoly, 1.0, true);
+    fillConvexPoly(mask, &GeoProy.roiConvexPoly[0], (int)GeoProy.roiConvexPoly.size(), 255, 8, 0);
+    GeoProy.maskConvexPoly = mask.clone();
+
+}
+
+
+
 //// Segmentation and Foot Boxes ////
 void foot::segmentation(){
 
@@ -131,6 +143,27 @@ void foot::segmentation(){
     frameAct.labels2Frame = labels2.clone();
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void foot::findFootBoxes() {
 

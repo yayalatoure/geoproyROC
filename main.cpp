@@ -11,9 +11,14 @@
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/video/background_segm.hpp>
 #include <opencv/cv.h>
+
 #include <QRect>
 #include <QDir>
+#include <QLabel>
 #include <QPainter>
+#include <QtGui>
+#include <QGuiApplication>
+
 
 using namespace std;
 using namespace cv;
@@ -22,9 +27,11 @@ int main(int argc, char *argv[]){
 
     cv::Mat img_cal, img_test;
 
+    QGuiApplication a(argc, argv);
+
     //// Images Directories
     string path_cal  = "/home/lalo/Desktop/Data_Videos/CAL_Test1/*.jpg";
-    string path_test = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/TEST01/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/Player3/*.jpg";
 
     //// Video Original
     int count_test = 195+145, count_cal = 0, limit = 150-145;
@@ -43,13 +50,16 @@ int main(int argc, char *argv[]){
     geoproy geoproyTest(true);
 
     geoproyTest.readCalibFile();
-    geoproyTest.genCalibPoints();
+    geoproyTest.genCalibPointsSuelo();
+    geoproyTest.genCalibPointsImage();
+    geoproyTest.genCalibPointsCorner();
 
 
     cout << geoproyTest.homography << "\n" << endl;
 
 
     QImage edit;
+    cv::Mat geopro, img;
 
     while(ch != 'q' && ch != 'Q') {
 
@@ -76,21 +86,34 @@ int main(int argc, char *argv[]){
         ///// Algoritmo /////
 
         if (Foot.frameAct.processFrame.data) {
-            if (count_cal < limit) {
-                Mat img = Foot.frameAct.processFrame.clone();
-                edit = QImage((uchar*) img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
-                geoproyTest.addCalibPoints(edit);
-            }
+
+            Foot.segmentation();
+            Foot.maskConvexPoly(geoproyTest);
+
+
+            img = Foot.frameAct.processFrame.clone();
+            edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
+            geoproyTest.addCalibPoints(edit);
+            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine()));
+
+
+
+
         }
+
+
+
+
+
 
 
         if (Foot.start && (Foot.frameAct.processFrame.data)) {
 
             cv::imshow("frameAct", Foot.frameAct.processFrame);
+//            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
+            cv::imshow("geoProy", geopro);
+            cv::imshow("segmConvexPoly", geoproyTest.maskConvexPoly);
 
-            QLabel myLabel;
-            myLabel.setPixmap(QPixmap::fromImage(edit));
-            myLabel.show();
 
 
         }
@@ -125,4 +148,5 @@ int main(int argc, char *argv[]){
 
     std::cout << "Hello, World!" << std::endl;
     return 0;
+
 }

@@ -13,7 +13,6 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-
 #include <opencv/cv.h>
 
 using namespace std;
@@ -22,36 +21,42 @@ using namespace cv;
 
 class geoproy {
 
-public:
+    public:
 
-    //// Constructor ////
-    explicit geoproy(bool start);
+        //// Constructor ////
+        explicit geoproy(bool start);
 
-    //// Read Calib File ////
-    void readCalibFile();
-    //// Generate Scene Calibpoints ////
-    void genCalibPoints();
-    //// Add CalibPoints to CalibImage ////
-    void addCalibPoints(QImage &image);
-    //// Transform Point from Image to Scene ////
-    static QPoint transform(Point2f p, cv::Mat &H);
-    //// Draw Rectangle Round CalibPoints////
-    void drawRectangle(QPainter &pnt, Point2f &p, cv::Mat &H);
+        //// Read Calib File ////
+        void readCalibFile();
+        //// Generate Scene Calibpoints ////
+        void genCalibPointsSuelo();
+        void genCalibPointsImage();
+        void genCalibPointsCorner();
 
 
+        //// Add CalibPoints to CalibImage (QImage) ////
+        void addCalibPoints(QImage &image);
+        //// Transform Point from Image to Scene ////
+        static cv::Point transform(Point2f p, cv::Mat &H);
+        //// Draw Rectangle Round CalibPoints////
+        void drawRectangleRed(QPainter &pnt, Point2f &p, cv::Mat &H);
+        void drawRectangleBlue(QPainter &pnt, cv::Mat &H);
 
 
-    //// Bool Atributes ////
-    bool start;
-    //// Mat Atributes ////
-    Mat homography;
-    Mat frameAct;
-    //// Points Vector Atributes ////
-    std::map<int, cv::Point2f> calibPoints;
+        //// ATRIBUTES ////
 
+        //// Bool Atributes ////
+        bool start;
+        //// Mat Atributes ////
+        Mat homography;
+        Mat maskConvexPoly;
+        //// Points Vector Atributes ////
+        std::map<int, cv::Point2f> calibPointsSuelo;
+        std::map<int, cv::Point2f> calibPointsImage;
+        std::map<int, cv::Point2f> calibPointsCornerSuelo;
+        std::map<int, cv::Point2f> calibPointsCornerImage;
 
-
-
+        vector<Point> roiConvexPoly;
 
 
 

@@ -195,26 +195,6 @@ void geoproy::addCalibPoints(QImage &image) {
 
     }
 
-    /*
-    for(it2=calibPointsCorner.begin(); it2!=it2_end; it2++) {
-
-        index = it2->first;
-        cv::Point2f &pc = it2->second;
-
-        pout = transform(pc, H);
-        p_im = QPoint(pout.x, pout.y);
-
-        //Draw circle
-        pnt.setPen(QColor(255,0,0));
-        pnt.drawEllipse(p_im, 3, 3);
-
-        //Draw text
-        pnt.setPen(QColor(0,255,0));
-        pnt.drawText(QPoint(p_im.x() + 5, p_im.y()), QString::number(index));
-
-    }
-     */
-
     drawRectangleBlue(pnt, H);
 
     pnt.end();

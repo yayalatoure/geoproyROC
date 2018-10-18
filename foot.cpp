@@ -21,12 +21,14 @@ cv::Scalar foot::cyan(255, 255, 0); // NOLINT
 cv::Scalar foot::green(0, 255, 0); // NOLINT
 cv::Scalar foot::ivory(240, 255, 255); // NOLINT
 cv::Scalar foot::blueviolet(226, 43, 138); // NOLINT
+cv::Scalar foot::orange(0, 165, 255);
 
 
 //// SEGMENTATION AND FOOT BOXES ////
 
 //// Draw Foot Rectangles from Measurement ////
 void foot::paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Scalar color){
+
     std::map<int, cv::Rect>::iterator it, it_end = bboxes.end();
     int i = 0;
     for(it = bboxes.begin(); it != it_end; it++) {
@@ -39,7 +41,7 @@ void foot::paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Sc
 }
 
 //// Get Bigger Blobs of Segmentation Image Lower Part ////
-void foot::getBlobs(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
+void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
 
     int ro = labels.rows, co = labels.cols;
     int label, x, y;
@@ -74,7 +76,7 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
     int Direc = 0, biggestblob = 1;
     string Direccion;
 
-    getBlobs(labels, bboxes); // NOLINT
+    getBlobsBoxes(labels, bboxes); // NOLINT
 
     for(unsigned int j=0; j < bboxes.size(); j++){
         if(bboxes[j].area() >= bboxes[biggestblob].area()) biggestblob = j;
@@ -86,7 +88,7 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
     Rect ROI;
     ROI.x = bboxes[biggestblob].x;
     ROI.y = int( bboxes[biggestblob].y + bboxes[biggestblob].height*0.8);
-    ROI.height = int(bboxes[biggestblob].height*0.2);
+    ROI.height = int(bboxes[biggestblob].height*0.5);                       //// porcentaje caja inferior
     ROI.width = bboxes[biggestblob].width;
 
     Mat mask = Mat::zeros(fg.size(), CV_8U);
@@ -97,7 +99,7 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
     fg.copyTo(fgROI, mask);
     // aplica componentes conectados otra vez.
     cv::connectedComponents(fgROI, labels2, 8, CV_32S);
-    getBlobs(labels2, fboxes);
+    getBlobsBoxes(labels2, fboxes);
 
 }
 
@@ -112,16 +114,29 @@ void foot::maskConvexPoly(geoproy GeoProy){
 
 }
 
+void foot::getImageStripe(){
+
+    getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBox);
+    paintRectangles(frameAct.processFrame, frameAct.segmLowerBox, orange);
+
+
+
+
+}
+
+
+
+
 //// Segmentation and Foot Boxes ////
 void foot::segmentation(){
 
-    cv::Mat processMasked, foreGround, labels, labels2, stats, centroids;
+    cv::Mat processMasked, foreGround, labels, stats, centroids;
 
     double backgroundRatio = 0.6;
-    double learningRate = 0.003; ////0.005
-    double varThreshold = 110;
+    double learningRate = 0.004; ////0.005
+    double varThreshold = 210;
     int    nmixtures = 3;
-    int    history = 200; ////150
+    int    history = 100; ////150
 
     static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
     mog->setNMixtures(nmixtures);
@@ -130,17 +145,25 @@ void foot::segmentation(){
 
     //// Start Segmentation ////
     //// Convex Polygon Mask ////
+    //frameAct.processFrame.copyTo(processMasked);
     frameAct.processFrame.copyTo(processMasked, frameAct.maskConvexPoly);
 
     mog->apply(processMasked, foreGround, 2*learningRate);
-
     cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 6))); ////(4,6)
     cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 5))); ////(4,6)
     cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 8, CV_32S);
 
     frameAct.segmentedFrame  =  foreGround.clone();
     frameAct.labelsFrame = labels.clone();
-    frameAct.labels2Frame = labels2.clone();
+
+
+    //// Select image Stripe ////
+
+
+
+
+
+
 
 }
 

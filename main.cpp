@@ -30,11 +30,15 @@ int main(int argc, char *argv[]){
     QGuiApplication a(argc, argv);
 
     //// Images Directories
+//    string path_cal  = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/CALIBRACION01/*.jpg";
+//    string path_test = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/TEST01/*.jpg";
+
     string path_cal  = "/home/lalo/Desktop/Data_Videos/CAL_Test1/*.jpg";
-    string path_test = "/home/lalo/Desktop/Data_Videos/Player1/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/Player3/*.jpg";
 
     //// Video Original
-    int count_test = 195+145, count_cal = 0, limit = 150-145;
+//    int count_test = 300+145, count_cal = 0, limit = 150-145;
+    int count_test = 165+145, count_cal = 0, limit = 150-145;
 
     vector<String> filenames_cal, filenames_test;
 
@@ -69,7 +73,7 @@ int main(int argc, char *argv[]){
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
             substring = filenames_test[count_test].substr(pos - digits);
             Foot.frameAct.processFrame = img_cal;
-            Foot.start = true;
+
 
             cout << substring << "\n" << endl;
 
@@ -85,10 +89,10 @@ int main(int argc, char *argv[]){
 
         ///// Algoritmo /////
 
-        if (Foot.frameAct.processFrame.data) {
+        if (Foot.frameAct.processFrame.data && Foot.start) {
 
             Foot.segmentation();
-
+            Foot.getImageStripe();
 
             img = Foot.frameAct.processFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);

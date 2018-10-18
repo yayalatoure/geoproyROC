@@ -54,6 +54,7 @@ typedef struct {
     map<int, Rect> footBoxes;
     map<int, Rect> blobBoxes;
     map<int, Rect> tempBoxes;
+    map<int, Rect> segmLowerBox;
 
 } ImageBoxes;
 
@@ -66,9 +67,10 @@ class foot {
 
         //// Segmentation & ROI (footBoxes) ////
         void maskConvexPoly(geoproy GeoProy);
+        void getImageStripe();
         void segmentation();
         void findFootBoxes();
-        void getBlobs(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
+        void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
         void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
 
         //// Measure Foot No Occluded Case ////
@@ -120,8 +122,8 @@ public:
         //// Int Atributes ////
         int Right = 1;
         int Left = 2;
-        int rowsIm = 480;
-        int colsIm = 640;
+        int rowsIm = 480; int colsIm = 640;
+//        int rowsIm = 304; int colsIm = 400;
 
         //// Bool Atributes ////
         bool start;
@@ -185,6 +187,7 @@ public:
         static cv::Scalar green;
         static cv::Scalar ivory;
         static cv::Scalar blueviolet;
+        static cv::Scalar orange;
 
 
 };

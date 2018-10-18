@@ -54,7 +54,8 @@ typedef struct {
     map<int, Rect> footBoxes;
     map<int, Rect> blobBoxes;
     map<int, Rect> tempBoxes;
-    map<int, Rect> segmLowerBox;
+    map<int, Rect> segmLowerBoxes;
+    vector<Rect>   segmRectVector;
 
 } ImageBoxes;
 
@@ -111,6 +112,7 @@ class foot {
         //// Drawing Result ////
         void drawingResults();
         void paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Scalar color);
+        void paintRectanglesVector(cv::Scalar color);
 
         //// Clear Variables ////
         void clearVariables();

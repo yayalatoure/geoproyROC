@@ -34,8 +34,21 @@ void foot::paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Sc
     for(it = bboxes.begin(); it != it_end; it++) {
         i += 1;
         cv::rectangle(img, it->second, color, 2);
-        if (i == 2)
-            break;
+//        if (i == 2)
+//            break;
+    }
+
+}
+
+void foot::paintRectanglesVector(cv::Scalar color){
+
+    std::vector<Rect>::iterator it, it_end = frameAct.segmRectVector.end();
+    int i = 0;
+    for(it = frameAct.segmRectVector.begin(); it != it_end; it++) {
+        i += 1;
+        cv::rectangle(frameAct.processFrame, frameAct.segmRectVector[i], color, 2);
+//        if (i == 2)
+//            break;
     }
 
 }
@@ -103,7 +116,6 @@ void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, 
 
 }
 
-
 //// Convex Polygon Platform Mask ////
 void foot::maskConvexPoly(geoproy GeoProy){
 
@@ -114,13 +126,31 @@ void foot::maskConvexPoly(geoproy GeoProy){
 
 }
 
+struct byArea {
+    bool operator () (const Rect &a, const Rect &b) {
+        return a.width*a.height > b.width*b.height ;
+    }
+};
+
 void foot::getImageStripe(){
 
-    getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBox);
-    paintRectangles(frameAct.processFrame, frameAct.segmLowerBox, orange);
+    frameAct.segmLowerBoxes.clear();
+    frameAct.segmRectVector.clear();
 
+    getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBoxes);
 
+    for(unsigned int j=0; j < frameAct.segmLowerBoxes.size(); j++){
+        frameAct.segmRectVector.push_back(frameAct.segmLowerBoxes[j]);
+    }
 
+    std::sort(frameAct.segmRectVector.begin(), frameAct.segmRectVector.end(), byArea());
+
+    cout << "Areas ordenadas: " << endl;
+    for (int i = 0; i < frameAct.segmRectVector.size() ; ++i) {
+        cout << frameAct.segmRectVector[i].area() << endl;
+    }
+
+    //paintRectanglesVector(orange);
 
 }
 
@@ -134,7 +164,7 @@ void foot::segmentation(){
 
     double backgroundRatio = 0.6;
     double learningRate = 0.004; ////0.005
-    double varThreshold = 210;
+    double varThreshold = 150; //// 210
     int    nmixtures = 3;
     int    history = 100; ////150
 

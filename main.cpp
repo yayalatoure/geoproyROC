@@ -72,6 +72,7 @@ int main(int argc, char *argv[]){
             img_cal = imread(filenames_cal[count_cal], CV_LOAD_IMAGE_COLOR);
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
             substring = filenames_test[count_test].substr(pos - digits);
+            Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_cal;
 
 
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]){
         } else {
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
             substring = filenames_test[count_test].substr(pos - digits);
+            Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
 
@@ -121,6 +123,8 @@ int main(int argc, char *argv[]){
 
         cout << "rows: " << Foot.frameAct.processFrame.rows << endl;
         cout << "cols: " << Foot.frameAct.processFrame.cols << endl;
+
+
 
         count_cal++;
         count_test++;

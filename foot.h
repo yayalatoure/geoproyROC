@@ -57,6 +57,8 @@ typedef struct {
     map<int, Rect> segmLowerBoxes;
     vector<Rect>   segmRectVector;
 
+    Rect segmLowerBox;
+
 } ImageBoxes;
 
 
@@ -71,7 +73,10 @@ class foot {
         void getImageStripe();
         void segmentation();
         void findFootBoxes();
+
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
+        void evaluateBoxes();
+
         void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
 
         //// Measure Foot No Occluded Case ////
@@ -112,10 +117,14 @@ class foot {
         //// Drawing Result ////
         void drawingResults();
         void paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Scalar color);
-        void paintRectanglesVector(cv::Scalar color);
+        void paintRectanglesVector();
 
         //// Clear Variables ////
         void clearVariables();
+
+
+//        template <class T>
+//        bool findValue(const cv::Mat &mat, T value);
 
 
 

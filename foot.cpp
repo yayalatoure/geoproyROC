@@ -23,6 +23,15 @@ cv::Scalar foot::ivory(240, 255, 255); // NOLINT
 cv::Scalar foot::blueviolet(226, 43, 138); // NOLINT
 cv::Scalar foot::orange(0, 165, 255);
 
+//// Euclidean Distance ////
+double foot::distance(cv::Point center_kalman, cv::Point center_measured) {
+    double dx = 0, dy = 0, result = 0;
+    dx = pow(center_kalman.x - center_measured.x, 2);
+    dy = pow(center_kalman.y - center_measured.y, 2);
+    result = sqrt(dx + dy);
+    return result;
+}
+
 
 //// SEGMENTATION AND FOOT BOXES ////
 
@@ -40,46 +49,63 @@ void foot::paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Sc
 
 }
 
-void foot::paintRectanglesVector(cv::Scalar color){
+void foot::paintRectanglesVector(){
 
-    std::vector<Rect>::iterator it, it_end = frameAct.segmRectVector.end();
-    int i = 0;
-    for(it = frameAct.segmRectVector.begin(); it != it_end; it++) {
-        i += 1;
-        cv::rectangle(frameAct.processFrame, frameAct.segmRectVector[i], color, 2);
-//        if (i == 2)
-//            break;
+    for(int i = 0; i < frameAct.segmRectVector.size(); i++) {
+        cv::rectangle(frameAct.processFrame, frameAct.segmRectVector[i], orange, 2);
     }
-
+    cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
 }
+
+struct byArea {
+    bool operator () (const Rect &a, const Rect &b) {
+        return a.width*a.height > b.width*b.height ;
+    }
+};
 
 //// Get Bigger Blobs of Segmentation Image Lower Part ////
 void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
+
+    frameAct.segmLowerBoxes.clear();
+    frameAct.segmRectVector.clear();
 
     int ro = labels.rows, co = labels.cols;
     int label, x, y;
 
     bboxes.clear();
-    for(int j=0; j<ro; ++j)
-        for(int i=0; i<co; ++i) {
-            label = labels.at<int>(j,i);
-            if(label > 0) {                    // Not Background?
-                if(bboxes.count(label) == 0) { // New label
-                    cv::Rect r(i,j,1,1);
+    for (int j = 0; j < ro; ++j) {
+        for (int i = 0; i < co; ++i) {
+            label = labels.at<int>(j, i);
+            if (label > 0) {                    // Not Background?
+                if (bboxes.count(label) == 0) { // New label
+                    cv::Rect r(i, j, 1, 1);
                     bboxes[label] = r;
                 } else {                       // Update rect
                     cv::Rect &r = bboxes[label];
-                    x = r.x + r.width  - 1;
+                    x = r.x + r.width - 1;
                     y = r.y + r.height - 1;
-                    if(i < r.x)  r.x = i;
-                    if(i > x)    x = i;
-                    if(j < r.y)  r.y = j;
-                    if(j > y)    y = j;
-                    r.width  = x - r.x + 1;
+                    if (i < r.x) r.x = i;
+                    if (i > x) x = i;
+                    if (j < r.y) r.y = j;
+                    if (j > y) y = j;
+                    r.width = x - r.x + 1;
                     r.height = y - r.y + 1;
                 }
             }
         }
+    }
+
+    for(unsigned int j=0; j < frameAct.segmLowerBoxes.size(); j++){
+        frameAct.segmRectVector.push_back(frameAct.segmLowerBoxes[j]);
+    }
+
+    std::sort(frameAct.segmRectVector.begin(), frameAct.segmRectVector.end(), byArea());
+
+    cout << "Areas ordenadas: " << endl;
+    for (int i = 0; i < frameAct.segmRectVector.size() ; ++i) {
+        cout << frameAct.segmRectVector[i].area() << endl;
+    }
+
 }
 
 //// Get Foot Boxes from Blobs and Labels ////
@@ -126,31 +152,52 @@ void foot::maskConvexPoly(geoproy GeoProy){
 
 }
 
-struct byArea {
-    bool operator () (const Rect &a, const Rect &b) {
-        return a.width*a.height > b.width*b.height ;
+void foot::evaluateBoxes(){
+    Rect ROI (0, 0, 1, 1);
+    frameAct.segmLowerBox = ROI;
+
+    cv::Point point1, point2;
+    double result;
+    int threshold = 50;
+
+    if(frameAct.segmRectVector.size()>1) {
+        point1.x = frameAct.segmRectVector[0].x;
+        point1.y = frameAct.segmRectVector[0].y;
+        point2.x = frameAct.segmRectVector[1].x;
+        point2.y = frameAct.segmRectVector[1].y;
+
+        cv::circle(frameAct.processFrame, point1, 2, CV_RGB(255, 0, 0), -1);
+        cv::circle(frameAct.processFrame, point2, 2, CV_RGB(255, 0, 0), -1);
+
+        result = distance(point1, point2);
+
+        if (result < threshold) {
+            frameAct.segmLowerBox.x = std::min(point1.x, point2.x);
+            frameAct.segmLowerBox.y = std::min(point1.y, point2.y);
+            frameAct.segmLowerBox.width = std::max(point1.x + frameAct.segmRectVector[0].width, point2.x +
+                                          frameAct.segmRectVector[1].width) - frameAct.segmLowerBox.x;
+            frameAct.segmLowerBox.height = std::max(point1.y + frameAct.segmRectVector[0].height, point2.y +
+                                           frameAct.segmRectVector[1].height) - frameAct.segmLowerBox.y;
+        }else{
+            frameAct.segmLowerBox.x = frameAct.segmRectVector[0].x;
+            frameAct.segmLowerBox.y = frameAct.segmRectVector[0].y;
+            frameAct.segmLowerBox.width = frameAct.segmRectVector[0].width;
+            frameAct.segmLowerBox.height = frameAct.segmRectVector[0].height;
+        }
     }
-};
+
+
+}
 
 void foot::getImageStripe(){
 
-    frameAct.segmLowerBoxes.clear();
-    frameAct.segmRectVector.clear();
-
     getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBoxes);
 
-    for(unsigned int j=0; j < frameAct.segmLowerBoxes.size(); j++){
-        frameAct.segmRectVector.push_back(frameAct.segmLowerBoxes[j]);
-    }
+    //// tomar dos cajitas mas grandes y medir distancia ////
+    evaluateBoxes();
 
-    std::sort(frameAct.segmRectVector.begin(), frameAct.segmRectVector.end(), byArea());
 
-    cout << "Areas ordenadas: " << endl;
-    for (int i = 0; i < frameAct.segmRectVector.size() ; ++i) {
-        cout << frameAct.segmRectVector[i].area() << endl;
-    }
-
-    //paintRectanglesVector(orange);
+    paintRectanglesVector();
 
 }
 
@@ -206,24 +253,24 @@ void foot::segmentation(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 void foot::findFootBoxes() {
 
     getFeet(frameAct.segmentedFrame, frameAct.blobBoxes, frameAct.labelsFrame, frameAct.labels2Frame, frameAct.footBoxes);
     found = frameAct.footBoxes[1].width > 0;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //// KALMAN FILTER ////
@@ -339,14 +386,7 @@ void foot::measureFoot(int pie){
     }
 }
 
-//// Euclidean Distance ////
-double foot::distance(cv::Point center_kalman, cv::Point center_measured) {
-    double dx = 0, dy = 0, result = 0;
-    dx = pow(center_kalman.x - center_measured.x, 2);
-    dy = pow(center_kalman.y - center_measured.y, 2);
-    result = sqrt(dx + dy);
-    return result;
-}
+
 
 //// Error Measure ////
 void foot::measureError1Np(int pie){

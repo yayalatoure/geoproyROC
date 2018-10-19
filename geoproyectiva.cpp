@@ -33,34 +33,36 @@ void geoproy::readCalibFile() {
         (*it)["Homography"] >> homography;
     }
 
+    homographyInv = homography.inv();
+
     fs.release();
 
 }
 
 void geoproy::genCalibPointsSuelo() {
 
-    calibPointsSuelo.clear();
+    calibPointsFloor.clear();
     cv::Point2f p;
     int step = 200;
 
     p.x = -step; p.y = -step;
-    calibPointsSuelo[1] = p;
+    calibPointsFloor[1] = p;
     p.x = 0;     p.y = -step;
-    calibPointsSuelo[2] = p;
+    calibPointsFloor[2] = p;
     p.x = step;  p.y = -step;
-    calibPointsSuelo[3] = p;
+    calibPointsFloor[3] = p;
     p.x = -step; p.y = 0;
-    calibPointsSuelo[4] = p;
+    calibPointsFloor[4] = p;
     p.x = 0;     p.y = 0;
-    calibPointsSuelo[5] = p;
+    calibPointsFloor[5] = p;
     p.x = step;  p.y = 0;
-    calibPointsSuelo[6] = p;
+    calibPointsFloor[6] = p;
     p.x = -step; p.y = step;
-    calibPointsSuelo[7] = p;
+    calibPointsFloor[7] = p;
     p.x = 0;     p.y = step;
-    calibPointsSuelo[8] = p;
+    calibPointsFloor[8] = p;
     p.x = step;  p.y = step;
-    calibPointsSuelo[9] = p;
+    calibPointsFloor[9] = p;
 
     genCalibPointsImage();
 
@@ -68,10 +70,10 @@ void geoproy::genCalibPointsSuelo() {
 
 void geoproy::genCalibPointsImage(){
 
-    std::map<int, cv::Point2f>::iterator it, it_end = calibPointsSuelo.end();
+    std::map<int, cv::Point2f>::iterator it, it_end = calibPointsFloor.end();
     int index;
 
-    for(it=calibPointsSuelo.begin(); it!=it_end; it++) {
+    for(it=calibPointsFloor.begin(); it!=it_end; it++) {
         index = it->first;
         cv::Point2f &p = it->second;
         calibPointsImage[index] = transform(p, homography);
@@ -81,21 +83,21 @@ void geoproy::genCalibPointsImage(){
 
 void geoproy::genCalibPointsCorner() {
 
-    calibPointsCornerSuelo.clear();
+    calibPointsCornerFloor.clear();
     cv::Point2f p;
     int step = 350;
 
     p.x = -step; p.y = -step;
-    calibPointsCornerSuelo[1] = p;
+    calibPointsCornerFloor[1] = p;
     p.x = step; p.y = -step;
-    calibPointsCornerSuelo[2] = p;
+    calibPointsCornerFloor[2] = p;
     p.x = step;  p.y = step;
-    calibPointsCornerSuelo[3] = p;
+    calibPointsCornerFloor[3] = p;
     p.x = -step; p.y = step;
-    calibPointsCornerSuelo[4] = p;
+    calibPointsCornerFloor[4] = p;
 
     for (int i = 1; i <= 4; ++i) {
-        calibPointsCornerImage[i] = transform(calibPointsCornerSuelo[i], homography);
+        calibPointsCornerImage[i] = transform(calibPointsCornerFloor[i], homography);
         roiConvexPoly.push_back(calibPointsCornerImage[i]);
     }
 
@@ -167,7 +169,7 @@ void geoproy::drawRectangleBlue(QPainter &pnt, cv::Mat &H){
 
 void geoproy::addCalibPoints(QImage &image) {
 
-    std::map<int, cv::Point2f>::iterator it1, it1_end = calibPointsSuelo.end();
+    std::map<int, cv::Point2f>::iterator it1, it1_end = calibPointsFloor.end();
     int index;
     QPoint p_im;
     QPainter pnt;
@@ -175,7 +177,7 @@ void geoproy::addCalibPoints(QImage &image) {
     cv::Point pout;
     cv::Mat &H = homography;
 
-    for(it1=calibPointsSuelo.begin(); it1!=it1_end; it1++) {
+    for(it1=calibPointsFloor.begin(); it1!=it1_end; it1++) {
         index = it1->first;
         cv::Point2f &p = it1->second;
 

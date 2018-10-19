@@ -55,6 +55,7 @@ void foot::paintRectanglesVector(){
         cv::rectangle(frameAct.processFrame, frameAct.segmRectVector[i], orange, 2);
     }
     cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
+
 }
 
 struct byArea {
@@ -101,11 +102,12 @@ void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
 
     std::sort(frameAct.segmRectVector.begin(), frameAct.segmRectVector.end(), byArea());
 
+    /*
     cout << "Areas ordenadas: " << endl;
     for (int i = 0; i < frameAct.segmRectVector.size() ; ++i) {
         cout << frameAct.segmRectVector[i].area() << endl;
     }
-
+    */
 }
 
 //// Get Foot Boxes from Blobs and Labels ////
@@ -152,7 +154,52 @@ void foot::maskConvexPoly(geoproy GeoProy){
 
 }
 
-void foot::evaluateBoxes(){
+void foot::zoneDetection(geoproy GeoProy){
+
+    cv::Point2f lowPointImage;
+    cv::Point   lowPointFloor;
+
+    lowPointImage.x = frameAct.segmLowerBox.x + frameAct.segmLowerBox.width/2;
+    lowPointImage.y = frameAct.segmLowerBox.y + frameAct.segmLowerBox.height;
+
+    lowPointFloor = GeoProy.transform(lowPointImage, GeoProy.homographyInv);
+
+    midZone = lowPointFloor.y > -50 && lowPointFloor.y <= 100;
+
+}
+
+
+void foot::linearFunction(){
+
+    int h = frameAct.segmLowerBox.height;
+    int newHeight;
+
+    double hsizeMax = 150.0;
+    double hsizeMin = 35.0;
+    double percentMax;
+
+    if (midZone) {
+        percentMax = 85.0;
+    }else {
+        percentMax = 60.0;
+    }
+
+    double slope = (percentMax/(hsizeMax-hsizeMin));
+    double intercept = -((percentMax/(hsizeMax-hsizeMin))*hsizeMin);
+
+    if(h > hsizeMin){
+        frameAct.segmCutPercent = slope*h + intercept;
+    }else{
+        frameAct.segmCutPercent = 0;
+    }
+
+    newHeight = int (h * ((100 - frameAct.segmCutPercent)/100));
+    frameAct.segmLowerBox.y += (h - newHeight);
+    frameAct.segmLowerBox.height = newHeight;
+
+}
+
+void foot::findLowerBox(){
     Rect ROI (0, 0, 1, 1);
     frameAct.segmLowerBox = ROI;
 
@@ -161,9 +208,9 @@ void foot::evaluateBoxes(){
     int threshold = 50;
 
     if(frameAct.segmRectVector.size()>1) {
-        point1.x = frameAct.segmRectVector[0].x;
+        point1.x = frameAct.segmRectVector[0].x + frameAct.segmRectVector[0].width/2;
         point1.y = frameAct.segmRectVector[0].y;
-        point2.x = frameAct.segmRectVector[1].x;
+        point2.x = frameAct.segmRectVector[1].x + frameAct.segmRectVector[1].width/2;
         point2.y = frameAct.segmRectVector[1].y;
 
         cv::circle(frameAct.processFrame, point1, 2, CV_RGB(255, 0, 0), -1);
@@ -172,12 +219,15 @@ void foot::evaluateBoxes(){
         result = distance(point1, point2);
 
         if (result < threshold) {
-            frameAct.segmLowerBox.x = std::min(point1.x, point2.x);
+
+            frameAct.segmLowerBox.x = std::min(frameAct.segmRectVector[0].x , frameAct.segmRectVector[1].x);
             frameAct.segmLowerBox.y = std::min(point1.y, point2.y);
-            frameAct.segmLowerBox.width = std::max(point1.x + frameAct.segmRectVector[0].width, point2.x +
-                                          frameAct.segmRectVector[1].width) - frameAct.segmLowerBox.x;
+            frameAct.segmLowerBox.width = std::max(frameAct.segmRectVector[0].x + frameAct.segmRectVector[0].width,
+                                                   frameAct.segmRectVector[1].x + frameAct.segmRectVector[1].width)
+                                                 - frameAct.segmLowerBox.x;
             frameAct.segmLowerBox.height = std::max(point1.y + frameAct.segmRectVector[0].height, point2.y +
                                            frameAct.segmRectVector[1].height) - frameAct.segmLowerBox.y;
+
         }else{
             frameAct.segmLowerBox.x = frameAct.segmRectVector[0].x;
             frameAct.segmLowerBox.y = frameAct.segmRectVector[0].y;
@@ -189,15 +239,19 @@ void foot::evaluateBoxes(){
 
 }
 
-void foot::getImageStripe(){
+
+
+
+void foot::getImageStripe(geoproy GeoProy){
 
     getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBoxes);
-
-    //// tomar dos cajitas mas grandes y medir distancia ////
-    evaluateBoxes();
-
+    findLowerBox();
 
     paintRectanglesVector();
+    linearFunction();
+    paintRectanglesVector();
+
+    zoneDetection(GeoProy);
 
 }
 

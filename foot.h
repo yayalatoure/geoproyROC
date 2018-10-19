@@ -57,7 +57,8 @@ typedef struct {
     map<int, Rect> segmLowerBoxes;
     vector<Rect>   segmRectVector;
 
-    Rect segmLowerBox;
+    Rect   segmLowerBox;
+    double segmCutPercent;
 
 } ImageBoxes;
 
@@ -70,12 +71,17 @@ class foot {
 
         //// Segmentation & ROI (footBoxes) ////
         void maskConvexPoly(geoproy GeoProy);
-        void getImageStripe();
+
         void segmentation();
         void findFootBoxes();
-
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
-        void evaluateBoxes();
+
+        void findLowerBox();
+        void zoneDetection(geoproy GeoProy);
+        void linearFunction();
+
+        void getImageStripe(geoproy GeoProy);
+
 
         void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
 
@@ -146,6 +152,7 @@ public:
         bool occlusion;
         bool totalOccR;
         bool totalOccL;
+        bool midZone = true;
 
         //// Image & Boxes Atributes ////
         ImageBoxes frameAct, frameAnt;

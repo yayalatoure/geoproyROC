@@ -49,11 +49,12 @@ class geoproy {
         bool start;
         //// Mat Atributes ////
         Mat homography;
+        Mat homographyInv;
 
         //// Points Vector Atributes ////
-        std::map<int, cv::Point2f> calibPointsSuelo;
-        std::map<int, cv::Point2f> calibPointsImage;
-        std::map<int, cv::Point2f> calibPointsCornerSuelo;
+        std::map<int, cv::Point2f> calibPointsFloor;
+        std::map<int, cv::Point2f> calibPointsImage; // en el plano perspectivo
+        std::map<int, cv::Point2f> calibPointsCornerFloor;
         std::map<int, cv::Point2f> calibPointsCornerImage;
 
         vector<Point> roiConvexPoly;

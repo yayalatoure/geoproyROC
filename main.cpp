@@ -59,7 +59,8 @@ int main(int argc, char *argv[]){
 
     Foot.maskConvexPoly(geoproyTest);
 
-    cout << geoproyTest.homography << "\n" << endl;
+    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
+    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
 
 
     QImage edit;
@@ -74,7 +75,6 @@ int main(int argc, char *argv[]){
             substring = filenames_test[count_test].substr(pos - digits);
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_cal;
-
 
             cout << substring << "\n" << endl;
 
@@ -94,7 +94,9 @@ int main(int argc, char *argv[]){
         if (Foot.frameAct.processFrame.data && Foot.start) {
 
             Foot.segmentation();
-            Foot.getImageStripe();
+            Foot.getImageStripe(geoproyTest);
+
+            cout << "Midzone?: " << Foot.midZone << endl;
 
             img = Foot.frameAct.processFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
@@ -120,10 +122,6 @@ int main(int argc, char *argv[]){
 
 
         }
-
-        cout << "rows: " << Foot.frameAct.processFrame.rows << endl;
-        cout << "cols: " << Foot.frameAct.processFrame.cols << endl;
-
 
 
         count_cal++;

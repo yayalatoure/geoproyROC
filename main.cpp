@@ -94,38 +94,58 @@ int main(int argc, char *argv[]){
         if (Foot.frameAct.processFrame.data && Foot.start) {
 
             Foot.segmentation();
-            Foot.getLowerBox(geoproyTest);
-            Foot.getFeetBoxes();
+            Foot.getLowerBox();
+
+
+            Foot.getFeetBoxes(geoproyTest);
+
+//            Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
+//
+//            Foot.measureFoot(Foot.Right);
+//            Foot.measureFoot(Foot.Left);
+//
+//            cout << "Zone?: " << Foot.platformZone << endl;
+//            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
+//            cout << "Occlusion?: " << Foot.occlusion << endl;
 
 
 
-            cout << "Midzone?: " << Foot.platformZone << endl;
+
+
+
+
+
+
+
+
+
 
             img = Foot.frameAct.processFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
             geoproyTest.addCalibPoints(edit);
             geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
 
+            Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
+//            Foot.drawingResults();
+
+        } else{
+            if(Foot.frameAct.processFrame.data){
+                Foot.segmentation();
+            }
         }
 
 
 
+        if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 
-
-
-
-        if (Foot.start && (Foot.frameAct.processFrame.data)) {
-
-            cv::imshow("frameAct", Foot.frameAct.processFrame);
+            cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
             //cv::imshow("geoProy", geopro);
 
-
-
-
         }
+
 
 
         count_cal++;

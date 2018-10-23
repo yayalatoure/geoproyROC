@@ -78,13 +78,16 @@ class foot {
         void segmentation();
         //void findFootBoxes();
 
-        void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
+        void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
+        void orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
         void findLowerBox();
+        void getLowerBox();
+
+
         void zoneDetection(geoproy GeoProy);
         void linearFunction();
-
-        void getLowerBox(geoproy GeoProy);
-        void getFeetBoxes();
+        void areasideFilter(std::map<int, cv::Rect> &bboxes);
+        void getFeetBoxes(geoproy GeoProy);
 
 
         //void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
@@ -148,7 +151,7 @@ public:
         int platformZone = 2;
 
         //// Bool Atributes ////
-        bool start;
+        bool start = false;
         bool found;
         bool Reset_R;
         bool Reset_L;

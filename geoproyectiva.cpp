@@ -106,7 +106,7 @@ void geoproy::genCalibPointsCorner() {
 
 cv::Point geoproy::transform(cv::Point2f p, cv::Mat &H) {
 
-    cv::Mat pin(3, 1, CV_64FC1);
+    cv::Mat pin(3, 1, CV_64FC1); // NOLINT
     pin.at<double>(0,0) = p.x;
     pin.at<double>(1,0) = p.y;
     pin.at<double>(2,0) = 1;

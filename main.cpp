@@ -94,14 +94,17 @@ int main(int argc, char *argv[]){
         if (Foot.frameAct.processFrame.data && Foot.start) {
 
             Foot.segmentation();
-            Foot.getImageStripe(geoproyTest);
+            Foot.getLowerBox(geoproyTest);
+            Foot.getFeetBoxes();
 
-            cout << "Midzone?: " << Foot.midZone << endl;
+
+
+            cout << "Midzone?: " << Foot.platformZone << endl;
 
             img = Foot.frameAct.processFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
             geoproyTest.addCalibPoints(edit);
-            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine()));
+            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
 
 
         }
@@ -116,7 +119,8 @@ int main(int argc, char *argv[]){
 
             cv::imshow("frameAct", Foot.frameAct.processFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
-            cv::imshow("geoProy", geopro);
+
+            //cv::imshow("geoProy", geopro);
 
 
 

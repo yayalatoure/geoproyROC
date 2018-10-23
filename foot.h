@@ -52,10 +52,13 @@ typedef struct {
 
     //// Foot Boxes ////
     map<int, Rect> footBoxes;
+    vector<Rect>   footBoxesVector;
+
     map<int, Rect> blobBoxes;
     map<int, Rect> tempBoxes;
     map<int, Rect> segmLowerBoxes;
-    vector<Rect>   segmRectVector;
+    vector<Rect>   segmLowerBoxesVector;
+
 
     Rect   segmLowerBox;
     double segmCutPercent;
@@ -73,17 +76,18 @@ class foot {
         void maskConvexPoly(geoproy GeoProy);
 
         void segmentation();
-        void findFootBoxes();
-        void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
+        //void findFootBoxes();
 
+        void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
         void findLowerBox();
         void zoneDetection(geoproy GeoProy);
         void linearFunction();
 
-        void getImageStripe(geoproy GeoProy);
+        void getLowerBox(geoproy GeoProy);
+        void getFeetBoxes();
 
 
-        void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
+        //void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
 
         //// Measure Foot No Occluded Case ////
         void measureFoot(int pie);
@@ -123,7 +127,7 @@ class foot {
         //// Drawing Result ////
         void drawingResults();
         void paintRectangles(cv::Mat &img, std::map<int, cv::Rect> &bboxes, cv::Scalar color);
-        void paintRectanglesVector();
+        void paintRectanglesVector(vector<Rect> &vectorBoxes, cv::Scalar color);
 
         //// Clear Variables ////
         void clearVariables();
@@ -141,6 +145,7 @@ public:
         int Left = 2;
         int rowsIm = 480; int colsIm = 640;
 //        int rowsIm = 304; int colsIm = 400;
+        int platformZone = 2;
 
         //// Bool Atributes ////
         bool start;
@@ -152,7 +157,7 @@ public:
         bool occlusion;
         bool totalOccR;
         bool totalOccL;
-        bool midZone = true;
+
 
         //// Image & Boxes Atributes ////
         ImageBoxes frameAct, frameAnt;

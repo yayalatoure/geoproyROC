@@ -15,13 +15,16 @@ foot::foot(bool start) {
     occlusion = false;
 }
 
-
 //// COLORS ////
-cv::Scalar foot::cyan(255, 255, 0); // NOLINT
+cv::Scalar foot::blue(255, 0, 0); // NOLINT
 cv::Scalar foot::green(0, 255, 0); // NOLINT
+cv::Scalar foot::red(0, 0, 255); // NOLINT
+
+cv::Scalar foot::cyan(255, 255, 0); // NOLINT
 cv::Scalar foot::ivory(240, 255, 255); // NOLINT
 cv::Scalar foot::blueviolet(226, 43, 138); // NOLINT
 cv::Scalar foot::orange(0, 165, 255);
+
 
 //// Euclidean Distance ////
 double foot::distance(cv::Point center_kalman, cv::Point center_measured) {
@@ -52,8 +55,8 @@ void foot::paintRectanglesVector(vector<Rect> &vectorBoxes, cv::Scalar color){
 
     for(int i = 0; i < vectorBoxes.size(); i++) {
         cv::rectangle(frameAct.processFrame, vectorBoxes[i], color, 2);
-        if (i == 1)
-            break;
+//        if (i == 1)
+//            break;
     }
 
 }
@@ -241,9 +244,6 @@ void foot::getLowerBox(){
 
 }
 
-
-
-
 void foot::zoneDetection(geoproy GeoProy){
 
     cv::Point2f lowPointImage;
@@ -275,12 +275,12 @@ void foot::linearFunction(){
 
     switch(platformZone) {
         case 1 :
-            percentMax = 80.0;
+            percentMax = 90.0;
             hsizeMax = 150.0;
-            hsizeMin = 40.0;
+            hsizeMin = 35.0;
             break;
         case 2 :
-            percentMax = 110.0;
+            percentMax = 115.0;
             hsizeMax = 150.0;
             hsizeMin = 30.0;
             break;
@@ -308,8 +308,8 @@ void foot::linearFunction(){
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
     std::map<int, cv::Rect> areaFiltered, sideFilteredH, sideFilteredW;
-    int thresholdArea = 150;
-    int thresholdSideH = 5;
+    int thresholdArea = 180;
+    int thresholdSideH = 8;
     int thresholdSideW = 5;
 
     for (int i = 0; i < bboxes.size() ; ++i) {
@@ -332,6 +332,38 @@ void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
         bboxes[l] = sideFilteredW[l];
     }
 }
+
+void foot::leftrightBoxes(){
+
+    int Rigth = 2;
+    int Left  = 1;
+    int thresholdArea = 200;
+    auto boxesSize = frameAct.footBoxes.size();
+
+
+    switch(boxesSize) {
+        case 1 :
+
+            break;
+        case 2 :
+            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
+            break;
+        case 3 :
+            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], red, 2);
+            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], blue, 2);
+            break;
+        default :
+            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], red, 2);
+            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], blue, 2);
+            break;
+    }
+
+
+    cout << "boxesSize: " << boxesSize << endl;
+
+
+}
+
 
 void foot::getFeetBoxes(geoproy GeoProy){
 
@@ -364,16 +396,26 @@ void foot::getFeetBoxes(geoproy GeoProy){
 
 
 
-    paintRectanglesVector(frameAct.footBoxesVector, green);
-//    paintRectangles(frameAct.processFrame, frameAct.footBoxes, green);
+//    paintRectanglesVector(frameAct.footBoxesVector, green);
+////    paintRectangles(frameAct.processFrame, frameAct.footBoxes, green);
 
     cv::Point center;
-    for (int j = 0; j < frameAct.footBoxes.size() ; ++j) {
+    for (int j = 0; j < frameAct.footBoxes.size() ; ++j) { //NOLINT
         center = (frameAct.footBoxes[j].br() + frameAct.footBoxes[j].tl())*0.5;
         cv::circle(frameAct.processFrame, center, 2, CV_RGB(0, 255, 0), -1);
     }
 
+    leftrightBoxes();
+
 }
+
+
+
+
+
+
+
+
 
 
 /*
@@ -406,9 +448,7 @@ void foot::findFootBoxes() {
 //    }
 //}
 
-
-
-
+/*
 ////// Measure Foot No Ocluded Case ////
 //void foot::measureFoot(int pie){
 //
@@ -420,6 +460,7 @@ void foot::findFootBoxes() {
 //
 //}
 
+*/
 
 
 

@@ -88,7 +88,7 @@ class foot {
         void linearFunction();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
         void getFeetBoxes(geoproy GeoProy);
-
+        void leftrightBoxes();
 
         //void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
 
@@ -209,8 +209,11 @@ public:
 
 
         //// Colors ////
-        static cv::Scalar cyan;
+        static cv::Scalar blue;
         static cv::Scalar green;
+        static cv::Scalar red;
+
+        static cv::Scalar cyan;
         static cv::Scalar ivory;
         static cv::Scalar blueviolet;
         static cv::Scalar orange;

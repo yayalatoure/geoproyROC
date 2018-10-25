@@ -116,21 +116,24 @@ void foot::segmentation(){
     double backgroundRatio = 0.6;
     double learningRate = 0.004; ////0.005
     double varThreshold = 250; //// 210
-    int    nmixtures = 5;
-    int    history = 150; ////150
+    int    nmixtures = 3;
+    int    history = 200; ////150
 
     static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
     mog->setNMixtures(nmixtures);
     mog->setBackgroundRatio(backgroundRatio);
     mog->setShadowValue(0);
+    mog->setShadowThreshold(0.42);
+    mog->setDetectShadows(1);
+
 
     //// Start Segmentation ////
     //// Convex Polygon Mask ////
     frameAct.processFrame.copyTo(processMasked, frameAct.maskConvexPoly);
 
     mog->apply(processMasked, foreGround, 2*learningRate);
-    cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 6))); ////(4,6)
-    cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 5))); ////(4,6)
+    cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5))); ////(4,6)
+    cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 3))); ////(4,6)
     cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 8, CV_32S);
 
     frameAct.segmentedFrame  =  foreGround.clone();

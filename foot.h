@@ -59,7 +59,6 @@ typedef struct {
     map<int, Rect> segmLowerBoxes;
     vector<Rect>   segmLowerBoxesVector;
 
-
     Rect   segmLowerBox;
     double segmCutPercent;
 
@@ -119,10 +118,6 @@ class foot {
         void matchingSelectPocc();
         //// Proyect Measure-Box ////
         void proyectBoxes();
-
-
-
-
 
 
 

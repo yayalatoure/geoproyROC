@@ -29,16 +29,24 @@ int main(int argc, char *argv[]){
 
     QGuiApplication a(argc, argv);
 
-    //// Images Directories
+//    //// Video Original
 //    string path_cal  = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/CALIBRACION01/*.jpg";
 //    string path_test = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/TEST01/*.jpg";
+//    int count_test = 195+145, count_cal = 0, limit = 150-145;
 
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/CAL_Test1/*.jpg";
-    string path_test = "/home/lalo/Desktop/Data_Videos/Player3/*.jpg";
 
-    //// Video Original
-//    int count_test = 300+145, count_cal = 0, limit = 150-145;
-    int count_test = 165+145, count_cal = 0, limit = 150-145;
+//    //// UPLA Grabacion 1
+//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
+//    //// Player3
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+//    int count_test = 165+145, count_cal = 0, limit = 150-145;
+
+
+    //// UPLA Grabacion 2
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player5/*.jpg";
+    int count_test = 1000+145, count_cal = 0, limit = 10;
+
 
     vector<String> filenames_cal, filenames_test;
 
@@ -96,7 +104,6 @@ int main(int argc, char *argv[]){
             Foot.segmentation();
             Foot.getLowerBox();
 
-
             Foot.getFeetBoxes(geoproyTest);
 
 //            Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
@@ -107,12 +114,6 @@ int main(int argc, char *argv[]){
 //            cout << "Zone?: " << Foot.platformZone << endl;
 //            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
 //            cout << "Occlusion?: " << Foot.occlusion << endl;
-
-
-
-
-
-
 
 
 
@@ -142,7 +143,7 @@ int main(int argc, char *argv[]){
             cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
-            //cv::imshow("geoProy", geopro);
+            cv::imshow("geoProy", geopro);
 
         }
 

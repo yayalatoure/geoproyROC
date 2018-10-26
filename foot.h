@@ -60,6 +60,7 @@ typedef struct {
     vector<Rect>   segmLowerBoxesVector;
 
     Rect   segmLowerBox;
+    Point  lowPointFloor;
     double segmCutPercent;
 
 } ImageBoxes;
@@ -84,7 +85,8 @@ class foot {
 
 
         void zoneDetection(geoproy GeoProy);
-        void linearFunction();
+        void linearFunctionHeigth();
+        void linearFunctionPosY();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
         void getFeetBoxes(geoproy GeoProy);
         void leftrightBoxes();

@@ -250,16 +250,15 @@ void foot::getLowerBox(){
 void foot::zoneDetection(geoproy GeoProy){
 
     cv::Point2f lowPointImage;
-    cv::Point   lowPointFloor;
 
     lowPointImage.x = frameAct.segmLowerBox.x + frameAct.segmLowerBox.width/2; // NOLINT
     lowPointImage.y = frameAct.segmLowerBox.y + frameAct.segmLowerBox.height;
 
-    lowPointFloor = GeoProy.transform(lowPointImage, GeoProy.homographyInv); // NOLINT
+    frameAct.lowPointFloor = GeoProy.transform(lowPointImage, GeoProy.homographyInv); // NOLINT
 
-    if (lowPointFloor.y <= -50) {
+    if (frameAct.lowPointFloor.y <= -50) {
         platformZone = 1;
-    }else if (lowPointFloor.y > -50 && lowPointFloor.y <= 100){
+    }else if (frameAct.lowPointFloor.y > -50 && frameAct.lowPointFloor.y <= 100){
         platformZone = 2;
     } else{
         platformZone = 3;
@@ -267,7 +266,8 @@ void foot::zoneDetection(geoproy GeoProy){
 
 }
 
-void foot::linearFunction(){
+/*
+void foot::linearFunctionHeigth(){
 
     int h = frameAct.segmLowerBox.height;
     int newHeight;
@@ -307,6 +307,50 @@ void foot::linearFunction(){
     frameAct.segmLowerBox.height = newHeight;
 
 }
+*/
+
+void foot::linearFunctionPosY(){
+
+    int h = frameAct.segmLowerBox.height;
+    int y = frameAct.lowPointFloor.y;
+    int newHeight;
+
+    double hsizeMax;
+    double hsizeMin;
+    double percentMax;
+
+    switch(platformZone) {
+        case 1 :
+            percentMax = 90.0;
+            hsizeMax = 150.0;
+            hsizeMin = 35.0;
+            break;
+        case 2 :
+            percentMax = 115.0;
+            hsizeMax = 150.0;
+            hsizeMin = 30.0;
+            break;
+        default :
+            percentMax = 70.0;
+            hsizeMax = 150.0;
+            hsizeMin = 40.0;
+    }
+
+    double slope = (percentMax/(hsizeMax-hsizeMin));
+    double intercept = -((percentMax/(hsizeMax-hsizeMin))*hsizeMin);
+
+    if(h > hsizeMin){
+        frameAct.segmCutPercent = slope*h + intercept;
+    }else{
+        frameAct.segmCutPercent = 0;
+    }
+
+    newHeight = int (h * ((100 - frameAct.segmCutPercent)/100));
+    frameAct.segmLowerBox.y += (h - newHeight);
+    frameAct.segmLowerBox.height = newHeight;
+
+}
+
 
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
@@ -371,7 +415,7 @@ void foot::leftrightBoxes(){
 void foot::getFeetBoxes(geoproy GeoProy){
 
     zoneDetection(std::move(GeoProy));
-    linearFunction();
+    linearFunctionHeigth();
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
     rectangle(mask, frameAct.segmLowerBox, Scalar(255), CV_FILLED);

@@ -21,11 +21,11 @@ void geoproy::readCalibFile() {
 //    //// Video Original
 //    QString fileName = "/home/lalo/Desktop/Data_Videos/VideoOriginal/CALIB/default_calib1.yml";
 
-//    //// UPLA Grabacion 1
-//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
-
-    //// UPLA Grabacion 2
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/default_calib_g2_1.yml";
+    //// UPLA Grabacion 1
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
+//
+//    //// UPLA Grabacion 2
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/default_calib_g2_1.yml";
 
     if(fileName == "")
         return;

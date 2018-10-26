@@ -35,17 +35,17 @@ int main(int argc, char *argv[]){
 //    int count_test = 195+145, count_cal = 0, limit = 150-145;
 
 
-//    //// UPLA Grabacion 1
-//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-//    //// Player3
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-//    int count_test = 165+145, count_cal = 0, limit = 150-145;
+    //// UPLA Grabacion 1
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
+    //// Player3
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+    int count_test = 165+145, count_cal = 0, limit = 150-145;
 
 
-    //// UPLA Grabacion 2
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player5/*.jpg";
-    int count_test = 1000+145, count_cal = 0, limit = 10;
+//    //// UPLA Grabacion 2
+//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player5/*.jpg";
+//    int count_test = 582-142, count_cal = 0, limit = 10;
 
 
     vector<String> filenames_cal, filenames_test;

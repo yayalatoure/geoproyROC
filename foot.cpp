@@ -314,33 +314,44 @@ void foot::linearFunctionPosY(){
     int h = frameAct.segmLowerBox.height;
     int y = frameAct.lowPointFloor.y;
     int newHeight;
+    double slope, intercept;
 
-    double hsizeMax;
-    double hsizeMin;
-    double percentMax;
+    //MinHeight
+    int  hsizeMin = 30;
+
+    //Zone1
+    double percentMax1 = 30.0;
+    double yMin1 = -300.0;
+    double yMax1 = -50.0;
+
+    //Zone2
+    double percentMax2 = 80.0;
+    double yMin2 = -50.0;
+    double yMax2 = 100.0;
+
+    //Zone3
+    double percentMax3 = 75.0;
+    double yMin3 = 100.0;
+    double yMax3 = 300.0;
 
     switch(platformZone) {
         case 1 :
-            percentMax = 90.0;
-            hsizeMax = 150.0;
-            hsizeMin = 35.0;
+            slope = (percentMax1/(yMax1-yMin1));
+            intercept = -((percentMax1/(yMax1-yMin1))*yMin1);
             break;
         case 2 :
-            percentMax = 115.0;
-            hsizeMax = 150.0;
-            hsizeMin = 30.0;
+            slope = (percentMax2-percentMax1)/(yMax2-yMin2);
+            intercept = percentMax1-((percentMax2-percentMax1)/(yMax2-yMin2))*yMin2;
             break;
         default :
-            percentMax = 70.0;
-            hsizeMax = 150.0;
-            hsizeMin = 40.0;
+            percentMax2 = 60.0;
+            slope = (percentMax3-percentMax2)/(yMax3-yMin3);
+            intercept = percentMax2-((percentMax3-percentMax2)/(yMax3-yMin3))*yMin3;
+
     }
 
-    double slope = (percentMax/(hsizeMax-hsizeMin));
-    double intercept = -((percentMax/(hsizeMax-hsizeMin))*hsizeMin);
-
     if(h > hsizeMin){
-        frameAct.segmCutPercent = slope*h + intercept;
+        frameAct.segmCutPercent = slope*y + intercept;
     }else{
         frameAct.segmCutPercent = 0;
     }
@@ -355,7 +366,7 @@ void foot::linearFunctionPosY(){
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
     std::map<int, cv::Rect> areaFiltered, sideFilteredH, sideFilteredW;
-    int thresholdArea = 180;
+    int thresholdArea = 160;
     int thresholdSideH = 8;
     int thresholdSideW = 5;
 
@@ -405,9 +416,7 @@ void foot::leftrightBoxes(){
             break;
     }
 
-
     cout << "boxesSize: " << boxesSize << endl;
-
 
 }
 
@@ -415,7 +424,8 @@ void foot::leftrightBoxes(){
 void foot::getFeetBoxes(geoproy GeoProy){
 
     zoneDetection(std::move(GeoProy));
-    linearFunctionHeigth();
+    //linearFunctionHeigth();
+    linearFunctionPosY();
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
     rectangle(mask, frameAct.segmLowerBox, Scalar(255), CV_FILLED);
@@ -456,58 +466,27 @@ void foot::getFeetBoxes(geoproy GeoProy){
 
 }
 
-
-
-
-
-
-
-
-
-
-/*
-void foot::findFootBoxes() {
-
-    getFeet(frameAct.segmentedFrame, frameAct.blobBoxes, frameAct.labelsFrame, frameAct.labels2Frame, frameAct.footBoxes);
-    found = frameAct.footBoxes[1].width > 0;
-
+//// Measure Foot ////
+void foot::measureFoot(int pie){
+    if(occlusion){
+        if(pie == Right) {
+            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
+            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
+        }else{
+            centerMeasured_L.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2; //(frameAct.footBoxes[Right].width*3) / 4;
+            centerMeasured_L.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
+        }
+    }else{
+        if(pie == Right) {
+            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
+            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
+        }else{
+            centerMeasured_L.x = frameAct.footBoxes[Left].x + frameAct.footBoxes[Left].width / 2;
+            centerMeasured_L.y = frameAct.footBoxes[Left].y + frameAct.footBoxes[Left].height;
+        }
+    }
 }
-*/
 
-////// Measure Foot No Ocluded Case ////
-//void foot::measureFoot(int pie){
-//    if(occlusion){
-//        if(pie == Right) {
-//            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 4;
-//            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-//        }else{
-//            centerMeasured_L.x = frameAct.footBoxes[Right].x + (frameAct.footBoxes[Right].width*3) / 4;
-//            centerMeasured_L.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-//        }
-//    }else{
-//        if(pie == Right) {
-//            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
-//            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-//        }else{
-//            centerMeasured_L.x = frameAct.footBoxes[Left].x + frameAct.footBoxes[Left].width / 2;
-//            centerMeasured_L.y = frameAct.footBoxes[Left].y + frameAct.footBoxes[Left].height;
-//        }
-//    }
-//}
-
-/*
-////// Measure Foot No Ocluded Case ////
-//void foot::measureFoot(int pie){
-//
-//
-//
-//
-//
-//
-//
-//}
-
-*/
 
 
 
@@ -619,10 +598,10 @@ void foot::kalmanResetStep(int pie){
     bool reset;
 
     if (pie == Right){
-            Reset_R = abs(errorNpAct1_R) > 2;//2
+            Reset_R = abs(errorNpAct1_R) > 2.2;//2
             reset = Reset_R;
     }else{
-            Reset_L = abs(errorNpAct1_L) > 2;//2
+            Reset_L = abs(errorNpAct1_L) > 2.2;//2
             reset = Reset_L;
     }
 
@@ -630,13 +609,13 @@ void foot::kalmanResetStep(int pie){
     if(!reset){
         if (pie == Right){
             error = (errorNpAct1_R); //+ errorNpAnt1_R)/2;
-            if(abs(error) < 2.2) {
+            if(abs(error) < 2.5) { //2.2
                 step_R = true;
             }
             errorNpAnt1_R = errorNpAct1_R;
         }else{
             error = (errorNpAct1_L); //  + errorNpAnt1_L)/2;
-            if(abs(error) < 2.2) {
+            if(abs(error) < 2.5) { //2.2
                 step_L = true;
             }
             errorNpAnt1_L = errorNpAct1_L;
@@ -899,16 +878,6 @@ void foot::proyectBoxes() {
 
 
 
-
-
-
-
-
-
-
-
-
-
 //// DRAW RESULTS ////
 
 
@@ -918,23 +887,25 @@ void foot::drawingResults() {
     //// Foots Rectangles ////
     paintRectangles(frameAct.resultFrame, frameAct.footBoxes, green);
 
-    if(!occlusion) {
+    //// Measured Centers ////
+    cv::circle(frameAct.resultFrame, centerMeasured_R, 3, green, -1);
+    cv::circle(frameAct.resultFrame, centerMeasured_L, 3, green, -1);
 
-        //// Measured Centers ////
-        cv::circle(frameAct.resultFrame, centerMeasured_R, 4, green, -1);
-        cv::circle(frameAct.resultFrame, centerMeasured_L, 4, orange, -1);
+//    if(!occlusion) {
 
-//        //// Kalman Prediction ////
-//        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
-//        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
-//        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
-//        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
+
+
+        //// Kalman Prediction ////
+        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
+        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
+        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
+        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
 
         //// Template Boxes Generated in Normal Detection ////
         //paintRectangles(frameAct.resultFrame, frameAct.tempBoxes, blueviolet);
 
 
-    }
+//    }
 //    //// Matchscore Partial Occlusion ////
 //    }else{
 //
@@ -988,15 +959,15 @@ void foot::drawingResults() {
 //
 //    }
 
-//    //// Step Detected ////
-//    if (step_R) {
-//        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], CV_RGB(0, 0, 255), 2);
-//        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, CV_RGB(0, 0, 255), -1);
-//    }
-//    if (step_L) {
-//        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], CV_RGB(0, 0, 255), 2);
-//        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, CV_RGB(0, 0, 255), -1);
-//    }
+    //// Step Detected ////
+    if (step_R) {
+        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], CV_RGB(0, 0, 255), 2);
+        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, CV_RGB(0, 0, 255), -1);
+    }
+    if (step_L) {
+        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], CV_RGB(0, 0, 255), 2);
+        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, CV_RGB(0, 0, 255), -1);
+    }
 
 }
 

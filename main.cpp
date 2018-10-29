@@ -37,9 +37,12 @@ int main(int argc, char *argv[]){
 
     //// UPLA Grabacion 1
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-    //// Player3
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-    int count_test = 165+145, count_cal = 0, limit = 150-145;
+    //// Player2
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
+    int count_test = 1210, count_cal = 0, limit = 5;
+//    //// Player3
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+//    int count_test = 165+145, count_cal = 0, limit = 5;
 
 
 //    //// UPLA Grabacion 2
@@ -58,6 +61,7 @@ int main(int argc, char *argv[]){
     string substring;
 
     char ch = 0;
+    int dT = 1;
     foot Foot(false);
     geoproy geoproyTest(true);
 
@@ -65,16 +69,21 @@ int main(int argc, char *argv[]){
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
 
-    Foot.maskConvexPoly(geoproyTest);
-
     cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
     cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
+
+    Foot.maskConvexPoly(geoproyTest);
+    Foot.kalmanInit(Foot.Right);
+    Foot.kalmanInit(Foot.Left);
 
 
     QImage edit;
     cv::Mat geopro, img;
 
     while(ch != 'q' && ch != 'Q') {
+
+        //// Transfer Frame Structure ////
+        Foot.frameAnt = Foot.frameAct;
 
         ////////// Frame Acquisition /////////
         if (count_cal < limit) {
@@ -101,24 +110,41 @@ int main(int argc, char *argv[]){
 
         if (Foot.frameAct.processFrame.data && Foot.start) {
 
+            //// Low Step Flag ////
+            Foot.step_R = false;
+            Foot.step_L = false;
+
+            //// Clone process frame to result frame ////
+            Foot.frameAct.resultFrame = Foot.frameAct.processFrame.clone();
+
             Foot.segmentation();
             Foot.getLowerBox();
 
             Foot.getFeetBoxes(geoproyTest);
 
-//            Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
-//
-//            Foot.measureFoot(Foot.Right);
-//            Foot.measureFoot(Foot.Left);
-//
-//            cout << "Zone?: " << Foot.platformZone << endl;
-//            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
-//            cout << "Occlusion?: " << Foot.occlusion << endl;
+            Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
 
+            cout << "Occlussion?: " << Foot.occlusion << endl;
 
+            //// Measure Foot ////
+            Foot.measureFoot(Foot.Right);
+            Foot.measureFoot(Foot.Left);
 
+            //// Kalman Filter ////
+            Foot.kalmanPredict(Foot.Right, dT);
+            Foot.kalmanPredict(Foot.Left, dT);
 
+            //// Kalman Update ////
+            Foot.kalmanUpdate(Foot.Right);
+            Foot.kalmanUpdate(Foot.Left);
 
+            //// Measure Error ////
+            Foot.measureError1Np(Foot.Right);
+            Foot.measureError1Np(Foot.Left);
+
+            //// Kalman Reset Step ////
+            Foot.kalmanResetStep(Foot.Right);
+            Foot.kalmanResetStep(Foot.Left);
 
 
             img = Foot.frameAct.processFrame.clone();
@@ -128,7 +154,13 @@ int main(int argc, char *argv[]){
 
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
-//            Foot.drawingResults();
+            Foot.drawingResults();
+
+
+//            cout << "Zone?: " << Foot.platformZone << endl;
+//            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
+//            cout << "Occlusion?: " << Foot.occlusion << endl;
+
 
         } else{
             if(Foot.frameAct.processFrame.data){
@@ -138,12 +170,14 @@ int main(int argc, char *argv[]){
 
 
 
+
+
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 
             cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
-            cv::imshow("geoProy", geopro);
+//            cv::imshow("geoProy", geopro);
 
         }
 
@@ -156,23 +190,6 @@ int main(int argc, char *argv[]){
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

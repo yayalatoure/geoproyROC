@@ -43,6 +43,10 @@ class geoproy {
         void drawRectangleBlue(QPainter &pnt, cv::Mat &H);
 
 
+
+
+    public:
+
         //// ATRIBUTES ////
 
         //// Bool Atributes ////

@@ -138,7 +138,7 @@ class foot {
 
 
 
-public:
+    public:
 
         //// Int Atributes ////
         int Right = 1;

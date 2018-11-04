@@ -8,6 +8,7 @@
 #include "geoproyectiva.h"
 #include "foot.h"
 
+#include <cstdlib>
 
 
 //// CONSTRUCTOR ////
@@ -110,7 +111,6 @@ void geoproy::genCalibPointsCorner() {
 
 }
 
-
 cv::Point geoproy::transform(cv::Point2f p, cv::Mat &H) {
 
     cv::Mat pin(3, 1, CV_64FC1); // NOLINT
@@ -208,5 +208,123 @@ void geoproy::addCalibPoints(QImage &image) {
 
     pnt.end();
 }
+
+void geoproy::generateSequence(int seedIn){
+
+    int rnd;
+
+    bool used[tplays];
+    memset(used, false, tplays*sizeof(bool));
+
+    srand(seedIn);
+
+    for (int i = 0; i < numPlays ; i++) {
+        rnd = rand()%(tplays-i); //NOLINT
+        for(int j=0, k=0; j<tplays; j++) {
+            if(used[j]) continue;
+
+            if(k == rnd) {
+                plays[i] = j+1;
+                used[j] = true;
+                break;
+            }
+            k++;
+        }
+    }
+}
+
+void geoproy::playsToObjetives() {
+
+    for (int i = 0; i < numPlays; ++i) {
+        switch(plays[i]) {
+            case 1 :
+                objetivesG2[i] = 9;
+                objetivesG3[i] = 1;
+                break;
+            case 2 :
+                objetivesG2[i] = 2;
+                objetivesG3[i] = 8;
+                break;
+            case 3 :
+                objetivesG2[i] = 1;
+                objetivesG3[i] = 9;
+                break;
+            case 4 :
+                objetivesG2[i] = 3;
+                objetivesG3[i] = 7;
+                break;
+            case 5 :
+                objetivesG2[i] = 4;
+                objetivesG3[i] = 6;
+                break;
+            case 6 :
+                objetivesG2[i] = 8;
+                objetivesG3[i] = 2;
+                break;
+            case 7 :
+                objetivesG2[i] = 4;
+                objetivesG3[i] = 6;
+                break;
+            case 8 :
+                objetivesG2[i] = 6;
+                objetivesG3[i] = 4;
+                break;
+            case 9 :
+                objetivesG2[i] = 9;
+                objetivesG3[i] = 1;
+                break;
+            case 10 :
+                objetivesG2[i] = 1;
+                objetivesG3[i] = 9;
+                break;
+            case 11 :
+                objetivesG2[i] = 6;
+                objetivesG3[i] = 4;
+                break;
+            case 12 :
+                objetivesG2[i] = 7;
+                objetivesG3[i] = 3;
+                break;
+            default :
+                break;
+        }
+    }
+}
+
+
+////void cada paso pasa por 8
+
+void geoproy::paintObjetive(int objetive){
+
+    playsToObjetives();
+
+    cout << "Objetives: " << endl;
+    for (int i = 0; i < numPlays; ++i) { //NOLINT
+        cout << objetivesG2[i] << "-";
+    }
+    cout << endl;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

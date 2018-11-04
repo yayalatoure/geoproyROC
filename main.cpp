@@ -37,12 +37,13 @@ int main(int argc, char *argv[]){
 
     //// UPLA Grabacion 1
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-    //// Player2
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
-    int count_test = 1210, count_cal = 0, limit = 5;
-//    //// Player3
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-//    int count_test = 165+145, count_cal = 0, limit = 5;
+//    //// Player2
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
+//    int count_test = 1210, count_cal = 0, limit = 5;
+    //// Player3
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+    int count_test = 165+145, count_cal = 0, limit = 5;
+    int seed = 463094935;
 
 
 //    //// UPLA Grabacion 2
@@ -72,13 +73,18 @@ int main(int argc, char *argv[]){
     cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
     cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
 
+    geoproyTest.generateSequence(seed);
+
     Foot.maskConvexPoly(geoproyTest);
     Foot.kalmanInit(Foot.Right);
     Foot.kalmanInit(Foot.Left);
 
-
     QImage edit;
     cv::Mat geopro, img;
+
+    geoproyTest.paintObjetive(1);
+
+
 
     while(ch != 'q' && ch != 'Q') {
 
@@ -177,7 +183,7 @@ int main(int argc, char *argv[]){
             cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
-//            cv::imshow("geoProy", geopro);
+            cv::imshow("geoProy", geopro);
 
         }
 

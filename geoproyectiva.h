@@ -42,7 +42,9 @@ class geoproy {
         void drawRectangleRed(QPainter &pnt, Point2f &p, cv::Mat &H);
         void drawRectangleBlue(QPainter &pnt, cv::Mat &H);
 
-
+        void generateSequence(int seed);
+        void playsToObjetives();
+        void paintObjetive(int objetive);
 
 
     public:
@@ -54,6 +56,14 @@ class geoproy {
         //// Mat Atributes ////
         Mat homography;
         Mat homographyInv;
+
+        //// Int Atributes ////
+
+        static const int numPlays = 10;
+        static const int tplays = 12;
+        int plays[numPlays];
+        int objetivesG2[numPlays];
+        int objetivesG3[numPlays];
 
         //// Points Vector Atributes ////
         std::map<int, cv::Point2f> calibPointsFloor;

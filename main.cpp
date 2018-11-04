@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_cal;
 
-            cout << substring << "\n" << endl;
+            cout << substring << endl;
 
         } else {
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
 
-            cout << substring << "\n" << endl;
+            cout << substring << endl;
 
         }
 
@@ -130,7 +130,6 @@ int main(int argc, char *argv[]){
 
             Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
 
-            cout << "Occlussion?: " << Foot.occlusion << endl;
 
             //// Measure Foot ////
             Foot.measureFoot(Foot.Right);
@@ -152,21 +151,28 @@ int main(int argc, char *argv[]){
             Foot.kalmanResetStep(Foot.Right);
             Foot.kalmanResetStep(Foot.Left);
 
+            //// Ask Objetives ////
+            Foot.askObjetives(geoproyTest);
 
-            img = Foot.frameAct.processFrame.clone();
-            edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
-            geoproyTest.addCalibPoints(edit);
-            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
+
 
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
             Foot.drawingResults();
+
+            img = Foot.frameAct.resultFrame.clone();
+            edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
+            geoproyTest.addCalibPoints(edit);
+            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
 
 
 //            cout << "Zone?: " << Foot.platformZone << endl;
 //            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
 //            cout << "Occlusion?: " << Foot.occlusion << endl;
 
+            cout << "StepR : " << Foot.step_R << endl;
+            cout << "StepL : " << Foot.step_L << endl;
+            cout << "\n" << endl;
 
         } else{
             if(Foot.frameAct.processFrame.data){
@@ -180,8 +186,8 @@ int main(int argc, char *argv[]){
 
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 
-            cv::imshow("frameAct", Foot.frameAct.resultFrame);
-            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
+//            cv::imshow("frameAct", Foot.frameAct.resultFrame);
+//            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
             cv::imshow("geoProy", geopro);
 

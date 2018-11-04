@@ -254,7 +254,7 @@ void foot::zoneDetection(geoproy GeoProy){
     lowPointImage.x = frameAct.segmLowerBox.x + frameAct.segmLowerBox.width/2; // NOLINT
     lowPointImage.y = frameAct.segmLowerBox.y + frameAct.segmLowerBox.height;
 
-    frameAct.lowPointFloor = GeoProy.transform(lowPointImage, GeoProy.homographyInv); // NOLINT
+    frameAct.lowPointFloor = GeoProy.transformFloor2Image(lowPointImage, GeoProy.homographyInv); // NOLINT
 
     if (frameAct.lowPointFloor.y <= -50) {
         platformZone = 1;
@@ -416,10 +416,9 @@ void foot::leftrightBoxes(){
             break;
     }
 
-    cout << "boxesSize: " << boxesSize << endl;
+//    cout << "boxesSize: " << boxesSize << endl;
 
 }
-
 
 void foot::getFeetBoxes(geoproy GeoProy){
 
@@ -434,7 +433,7 @@ void foot::getFeetBoxes(geoproy GeoProy){
     // copia fg a fgROI donde mask es distinto de cero.
     frameAct.segmentedFrame.copyTo(fgROI, mask);
 
-    imshow("fgROI", fgROI);
+//    imshow("fgROI", fgROI);
 
     // aplica componentes conectados otra vez.
     cv::connectedComponents(fgROI, frameAct.labels2Frame, 8, CV_32S);
@@ -450,7 +449,6 @@ void foot::getFeetBoxes(geoproy GeoProy){
     ////
 
     orderVectorBoxes(frameAct.footBoxes, frameAct.footBoxesVector);
-
 
 
 //    paintRectanglesVector(frameAct.footBoxesVector, green);
@@ -875,6 +873,74 @@ void foot::proyectBoxes() {
 
 
 
+//// OBJETIVE MATCHING ////
+
+
+//// Ask which objetive is near of step given ////
+
+
+//// MEDIR DISTANCIA EN EL PISO!!!!
+//// PARA PODER COMPARAR EN CENTIMETROS!!!!
+
+void foot::askObjetives(geoproy GeoProy){
+
+    int totalObjetives = 9;
+    double objetiveThreshold = 30;
+    double resultDistance;
+
+    cv::Point stepPoint;
+
+    if (step_L){
+        stepPoint = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
+        cout << "StepPoint L: " << stepPoint << endl;
+        for (int i = 0; i < totalObjetives; ++i) {
+            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            if (resultDistance < objetiveThreshold){
+                cout << "Objetivo Reach L: " << GeoProy.calibPointsFloor[i] << endl;
+                break;
+            }
+
+        }
+
+    }
+    if (step_R){
+        stepPoint = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
+        cout << "StepPoint R: " << stepPoint << endl;
+        for (int i = 0; i < totalObjetives; ++i) {
+            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            if (resultDistance < objetiveThreshold){
+                cout << "Objetivo Reach R: " << GeoProy.calibPointsFloor[i] << "\n" << endl;
+                break;
+            }
+
+        }
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -888,18 +954,18 @@ void foot::drawingResults() {
     paintRectangles(frameAct.resultFrame, frameAct.footBoxes, green);
 
     //// Measured Centers ////
-    cv::circle(frameAct.resultFrame, centerMeasured_R, 3, green, -1);
-    cv::circle(frameAct.resultFrame, centerMeasured_L, 3, green, -1);
+//    cv::circle(frameAct.resultFrame, centerMeasured_R, 3, green, -1);
+//    cv::circle(frameAct.resultFrame, centerMeasured_L, 3, green, -1);
 
 //    if(!occlusion) {
 
 
 
         //// Kalman Prediction ////
-        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
-        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
-        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
-        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
+//        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
+//        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
+//        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
+//        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
 
         //// Template Boxes Generated in Normal Detection ////
         //paintRectangles(frameAct.resultFrame, frameAct.tempBoxes, blueviolet);
@@ -962,11 +1028,11 @@ void foot::drawingResults() {
     //// Step Detected ////
     if (step_R) {
         cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], CV_RGB(0, 0, 255), 2);
-        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, CV_RGB(0, 0, 255), -1);
+        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, orange, -1);
     }
     if (step_L) {
         cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], CV_RGB(0, 0, 255), 2);
-        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, CV_RGB(0, 0, 255), -1);
+        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, ivory, -1);
     }
 
 }

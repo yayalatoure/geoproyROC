@@ -84,7 +84,7 @@ void geoproy::genCalibPointsImage(){
     for(it=calibPointsFloor.begin(); it!=it_end; it++) {
         index = it->first;
         cv::Point2f &p = it->second;
-        calibPointsImage[index] = transform(p, homography);
+        calibPointsImage[index] = transformFloor2Image(p, homography);
     }
 
 }
@@ -105,13 +105,13 @@ void geoproy::genCalibPointsCorner() {
     calibPointsCornerFloor[4] = p;
 
     for (int i = 1; i <= 4; ++i) {
-        calibPointsCornerImage[i] = transform(calibPointsCornerFloor[i], homography);
+        calibPointsCornerImage[i] = transformFloor2Image(calibPointsCornerFloor[i], homography);
         roiConvexPoly.push_back(calibPointsCornerImage[i]);
     }
 
 }
 
-cv::Point geoproy::transform(cv::Point2f p, cv::Mat &H) {
+cv::Point geoproy::transformFloor2Image(cv::Point2f p, cv::Mat &H) {
 
     cv::Mat pin(3, 1, CV_64FC1); // NOLINT
     pin.at<double>(0,0) = p.x;
@@ -133,20 +133,20 @@ void geoproy::drawRectangleRed(QPainter &pnt, Point2f &p, cv::Mat &H){
     int hside = 50;
     pnt.setPen(QColor(255,255,0));
 
-    point1 = transform(cv::Point2f(p.x-hside, p.y-hside), H);
-    point2 = transform(cv::Point2f(p.x+hside, p.y-hside), H);
+    point1 = transformFloor2Image(cv::Point2f(p.x-hside, p.y-hside), H);
+    point2 = transformFloor2Image(cv::Point2f(p.x+hside, p.y-hside), H);
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-    point1 = transform(cv::Point2f(p.x+hside, p.y-hside), H);
-    point2 = transform(cv::Point2f(p.x+hside, p.y+hside), H);
+    point1 = transformFloor2Image(cv::Point2f(p.x+hside, p.y-hside), H);
+    point2 = transformFloor2Image(cv::Point2f(p.x+hside, p.y+hside), H);
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-    point1 = transform(cv::Point2f(p.x+hside, p.y+hside), H);
-    point2 = transform(cv::Point2f(p.x-hside, p.y+hside), H);
+    point1 = transformFloor2Image(cv::Point2f(p.x+hside, p.y+hside), H);
+    point2 = transformFloor2Image(cv::Point2f(p.x-hside, p.y+hside), H);
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
-    point1 = transform(cv::Point2f(p.x-hside, p.y+hside), H);
-    point2 = transform(cv::Point2f(p.x-hside, p.y-hside), H);
+    point1 = transformFloor2Image(cv::Point2f(p.x-hside, p.y+hside), H);
+    point2 = transformFloor2Image(cv::Point2f(p.x-hside, p.y-hside), H);
     pnt.drawLine(QPoint(point1.x, point1.y), QPoint(point2.x, point2.y));
 
 }
@@ -188,7 +188,7 @@ void geoproy::addCalibPoints(QImage &image) {
         index = it1->first;
         cv::Point2f &p = it1->second;
 
-        pout = transform(p, H);
+        pout = transformFloor2Image(p, H);
         p_im = QPoint(pout.x, pout.y);
 
         //Draw circle
@@ -292,7 +292,10 @@ void geoproy::playsToObjetives() {
 }
 
 
-////void cada paso pasa por 8
+
+
+
+
 
 void geoproy::paintObjetive(int objetive){
 

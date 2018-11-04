@@ -37,13 +37,14 @@ class geoproy {
         //// Add CalibPoints to CalibImage (QImage) ////
         void addCalibPoints(QImage &image);
         //// Transform Point from Image to Scene ////
-        static cv::Point transform(Point2f p, cv::Mat &H);
+        static cv::Point transformFloor2Image(Point2f p, cv::Mat &H);
         //// Draw Rectangle Round CalibPoints////
         void drawRectangleRed(QPainter &pnt, Point2f &p, cv::Mat &H);
         void drawRectangleBlue(QPainter &pnt, cv::Mat &H);
 
         void generateSequence(int seed);
         void playsToObjetives();
+
         void paintObjetive(int objetive);
 
 

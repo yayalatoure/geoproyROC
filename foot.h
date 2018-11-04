@@ -122,6 +122,9 @@ class foot {
         void proyectBoxes();
 
 
+        //// Objetive Matching ////
+        void askObjetives(geoproy GeoProy);
+
 
 
         //// Drawing Result ////

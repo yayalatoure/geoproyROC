@@ -466,12 +466,13 @@ void foot::getFeetBoxes(geoproy GeoProy){
 
 //// Measure Foot ////
 void foot::measureFoot(int pie){
+
     if(occlusion){
         if(pie == Right) {
             centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
             centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
         }else{
-            centerMeasured_L.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2; //(frameAct.footBoxes[Right].width*3) / 4;
+            centerMeasured_L.x = frameAct.footBoxes[Right].x + (frameAct.footBoxes[Right].width) / 2; //(frameAct.footBoxes[Right].width*3) / 4;
             centerMeasured_L.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
         }
     }else{
@@ -706,8 +707,9 @@ void foot::kalmanUpdate(int pie){
 
 
 
-//// TEMPLATE NORMAL DETECTION ////
 
+
+//// TEMPLATE NORMAL DETECTION ////
 
 //// Generate Template ////
 void foot::generateTemplateNp(){
@@ -743,9 +745,7 @@ void foot::generateTemplateNp(){
 
 }
 
-
 //// OCCLUSION ////
-
 
 //// Matching Score Partial Occlusion
 //// gets the matching score for Right and Left foot.
@@ -876,67 +876,172 @@ void foot::proyectBoxes() {
 //// OBJETIVE MATCHING ////
 
 
-//// Ask which objetive is near of step given ////
 
 
-//// MEDIR DISTANCIA EN EL PISO!!!!
-//// PARA PODER COMPARAR EN CENTIMETROS!!!!
+void foot::logMatchingTime(){
 
-void foot::askObjetives(geoproy GeoProy){
 
-    int totalObjetives = 9;
-    double objetiveThreshold = 30;
-    double resultDistance;
 
-    cv::Point stepPoint;
+}
 
-    if (step_L){
-        stepPoint = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
-        cout << "StepPoint L: " << stepPoint << endl;
-        for (int i = 0; i < totalObjetives; ++i) {
-            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
-            if (resultDistance < objetiveThreshold){
-                cout << "Objetivo Reach L: " << GeoProy.calibPointsFloor[i] << endl;
-                break;
-            }
+void foot::logMatchingErrorTime(){
 
-        }
-
-    }
-    if (step_R){
-        stepPoint = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
-        cout << "StepPoint R: " << stepPoint << endl;
-        for (int i = 0; i < totalObjetives; ++i) {
-            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
-            if (resultDistance < objetiveThreshold){
-                cout << "Objetivo Reach R: " << GeoProy.calibPointsFloor[i] << "\n" << endl;
-                break;
-            }
-
-        }
-
-    }
 
 
 }
 
 
 
+//// Ask which objetive is near of step given ////
+void foot::askObjetives(geoproy GeoProy){
+
+    int totalObjetives = 9;
+    double objetiveThreshold = 35;
+    double resultDistance;
+
+    cv::Point stepPoint;
+
+    if (step_R){
+        stepPoint = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
+//        cout << "StepPoint R: " << stepPoint << endl;
+        for (int i = 1; i <= totalObjetives; ++i) {
+            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            if (resultDistance < objetiveThreshold){
+//                cout << "Objetivo Reach R: " << i << "\n" << endl;
+                objetive = i;
+                foundMatchR = true;
+                break;
+            }else{
+                foundMatchR = false;
+            }
+        }
+    }else{
+        foundMatchR = false;
+    }
+
+
+    if (step_L){
+        stepPoint = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
+//        cout << "StepPoint L: " << stepPoint << endl;
+        for (int i = 1; i <= totalObjetives; ++i) {
+            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            if (resultDistance < objetiveThreshold){
+//                cout << "Objetivo Reach L: " << i << endl;
+                objetive = i;
+                foundMatchL = true;
+                break;
+            }else{
+                foundMatchL = false;
+            }
+        }
+    }else{
+        foundMatchL = false;
+    }
 
 
 
+    //// considera hacer codigo especial para el caso del centro
+    //// a veces el mono esta al centro con los pies separados no
+    //// necesariamente pegados al punto central
+
+
+}
+
+void foot::centerZoneDetection(geoproy GeoProy){
+
+    cv::Point2f feetPosFlootR, feetPosFloorL;
+    bool centerFlagR = false;
+    bool centerFlagL = false;
+
+    feetPosFlootR = GeoProy.transformFloor2Image(centerMeasured_R, GeoProy.homographyInv); // NOLINT
+    feetPosFloorL = GeoProy.transformFloor2Image(centerMeasured_L, GeoProy.homographyInv); // NOLINT
+
+    //// logica inversa -> esta afuera = true
+    if (feetPosFlootR.y > -50 && feetPosFlootR.y < 50) {
+        if(feetPosFlootR.x > -50 && feetPosFlootR.x < 50){
+            centerFlagR = false;
+        }
+    }else{
+        centerFlagR = true;
+    }
+
+    if (feetPosFloorL.y > -50 && feetPosFloorL.y < 50) {
+        if(feetPosFloorL.x > -50 && feetPosFloorL.x < 50){
+            centerFlagL = false;
+        }
+    }else{
+        centerFlagL = true;
+    }
+
+    if(centerFlagL && centerFlagR){
+        countCenterOut++;
+    }else{
+        countCenterOut = 0;
+    }
+
+}
 
 
 
+void foot::matchingCompare(geoproy GeoProy){
+
+    int countCenterOutTh = 10;
+
+    if (countCenterOut >= countCenterOutTh){
+        centerFlag = false;
+    }
+
+    if (foundMatchR || foundMatchL){
 
 
+        if (objetive == 5){
 
 
+            if(!centerFlag){
+
+                if (!objetiveFlag){
+                    cout << "Log Objetive Error Event: " << endl;
+                    cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << "None" << endl;
+                    cout << "\n" << endl;
+                    sequenceCount++;
+                }
+
+                cout << "Log Center Match Event: Foot ";
+                if (foundMatchL && foundMatchR) cout << "Rigth and Left" << endl;
+                else if (foundMatchR) cout << "Rigth" << endl;
+                else cout << "Left" << endl;
+
+                centerFlag = true;
+                objetiveFlag = false;
+            }
+
+        }else{
+
+            if (!objetiveFlag){
+                if (objetive == GeoProy.objetivesG2[sequenceCount]){
+                    cout << "Log Objetive Match Event: Foot ";
+                    if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
+                    else cout << "Left" <<  " - Objetivo: " << objetive << endl;
+                    cout << "\n" << endl;
+                    centerFlag = false;
+                    objetiveFlag = true;
+                    sequenceCount++;
+                }else{
+                    cout << "Log Objetive Error Event: Foot " << endl;
+                    if (foundMatchR) cout << "Rigth" << endl;
+                    else cout << "Left" << endl;
+                    cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << objetive << endl;
+                    cout << "\n" << endl;
+                    centerFlag = false;
+                    objetiveFlag = true;
+                    sequenceCount++;
+                }
+            }
+        }
+    }
 
 
-
-
-
+}
 
 
 
@@ -954,8 +1059,8 @@ void foot::drawingResults() {
     paintRectangles(frameAct.resultFrame, frameAct.footBoxes, green);
 
     //// Measured Centers ////
-//    cv::circle(frameAct.resultFrame, centerMeasured_R, 3, green, -1);
-//    cv::circle(frameAct.resultFrame, centerMeasured_L, 3, green, -1);
+    cv::circle(frameAct.resultFrame, centerMeasured_R, 3, green, -1);
+    cv::circle(frameAct.resultFrame, centerMeasured_L, 3, green, -1);
 
 //    if(!occlusion) {
 

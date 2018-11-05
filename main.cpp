@@ -84,6 +84,10 @@ int main(int argc, char *argv[]){
 
     geoproyTest.paintObjetive(1);
 
+    cout << "\n" << endl;
+    cout << "Start Algorithm" << endl;
+    cout << "\n" << endl;
+
 
 
     while(ch != 'q' && ch != 'Q') {
@@ -99,7 +103,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_cal;
 
-            cout << substring << endl;
+//            cout << substring << endl;
 
         } else {
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
@@ -108,7 +112,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
 
-            cout << substring << endl;
+//            cout << substring << endl;
 
         }
 
@@ -151,8 +155,14 @@ int main(int argc, char *argv[]){
             Foot.kalmanResetStep(Foot.Right);
             Foot.kalmanResetStep(Foot.Left);
 
+            //// Center Zone? ////
+            Foot.centerZoneDetection(geoproyTest);
+
             //// Ask Objetives ////
             Foot.askObjetives(geoproyTest);
+
+
+            Foot.matchingCompare(geoproyTest);
 
 
 
@@ -170,9 +180,17 @@ int main(int argc, char *argv[]){
 //            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
 //            cout << "Occlusion?: " << Foot.occlusion << endl;
 
-            cout << "StepR : " << Foot.step_R << endl;
-            cout << "StepL : " << Foot.step_L << endl;
-            cout << "\n" << endl;
+//            cout << "StepR : " << Foot.step_R << endl;
+//            cout << "StepL : " << Foot.step_L << endl;
+
+//            cout << "CenterFlag: " << Foot.centerFlag << endl;
+//            cout << "CountCenterOut: " << Foot.countCenterOut << endl;
+
+//            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
+//            cout << "FoundMatchL: " << Foot.foundMatchL << endl;
+
+
+//            cout << "\n" << endl;
 
         } else{
             if(Foot.frameAct.processFrame.data){

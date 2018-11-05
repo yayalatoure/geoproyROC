@@ -123,7 +123,13 @@ class foot {
 
 
         //// Objetive Matching ////
+        void logMatchingTime();
+        void logMatchingErrorTime();
+
         void askObjetives(geoproy GeoProy);
+        void centerZoneDetection(geoproy GeoProy);
+
+        void matchingCompare(geoproy GeoProy);
 
 
 
@@ -148,7 +154,13 @@ class foot {
         int Left = 2;
         int rowsIm = 480; int colsIm = 640;
 //        int rowsIm = 304; int colsIm = 400;
+
+
+
         int platformZone = 2;
+        int objetive;
+        int sequenceCount = 0;
+        int countCenterOut = 0;
 
         //// Bool Atributes ////
         bool start = false;
@@ -160,6 +172,11 @@ class foot {
         bool occlusion;
         bool totalOccR;
         bool totalOccL;
+
+        bool foundMatchR = false;
+        bool foundMatchL = false;
+        bool centerFlag = false;
+        bool objetiveFlag = true;
 
 
         //// Image & Boxes Atributes ////

@@ -129,7 +129,7 @@ class foot {
         void askObjetives(geoproy GeoProy);
         void centerZoneDetection(geoproy GeoProy);
 
-        void matchingCompare(geoproy GeoProy);
+        void matchingCompare(geoproy &GeoProy);
 
 
 
@@ -162,6 +162,8 @@ class foot {
         int sequenceCount = 0;
         int countCenterOut = 0;
 
+
+
         //// Bool Atributes ////
         bool start = false;
         bool found;
@@ -177,6 +179,7 @@ class foot {
         bool foundMatchL = false;
         bool centerFlag = false;
         bool objetiveFlag = true;
+        bool paint = false;
 
 
         //// Image & Boxes Atributes ////

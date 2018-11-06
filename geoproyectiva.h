@@ -45,7 +45,7 @@ class geoproy {
         void generateSequence(int seed);
         void playsToObjetives();
 
-        void paintObjetive(int objetive);
+        void paintMatchOrError(Mat &image, int objetive, cv::Scalar color);
 
 
     public:
@@ -65,6 +65,8 @@ class geoproy {
         int plays[numPlays];
         int objetivesG2[numPlays];
         int objetivesG3[numPlays];
+
+        int countVisRect;
 
         //// Points Vector Atributes ////
         std::map<int, cv::Point2f> calibPointsFloor;

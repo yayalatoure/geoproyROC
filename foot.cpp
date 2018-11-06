@@ -243,7 +243,7 @@ void foot::getLowerBox(){
     orderVectorBoxes(frameAct.segmLowerBoxes, frameAct.segmLowerBoxesVector);
     findLowerBox();
 
-    cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
+//    cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
 
 }
 
@@ -901,13 +901,12 @@ void foot::askObjetives(geoproy GeoProy){
 
     cv::Point stepPoint;
 
+    //// para cada paso R verifico si el punto esta en algun objetivo
     if (step_R){
         stepPoint = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
-//        cout << "StepPoint R: " << stepPoint << endl;
         for (int i = 1; i <= totalObjetives; ++i) {
             resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
             if (resultDistance < objetiveThreshold){
-//                cout << "Objetivo Reach R: " << i << "\n" << endl;
                 objetive = i;
                 foundMatchR = true;
                 break;
@@ -983,7 +982,7 @@ void foot::centerZoneDetection(geoproy GeoProy){
 
 
 
-void foot::matchingCompare(geoproy GeoProy){
+void foot::matchingCompare(geoproy &GeoProy){
 
     int countCenterOutTh = 10;
 
@@ -991,18 +990,20 @@ void foot::matchingCompare(geoproy GeoProy){
         centerFlag = false;
     }
 
-    if (foundMatchR || foundMatchL){
+    if (foundMatchR || foundMatchL) {
 
+        if (objetive == 5) {
 
-        if (objetive == 5){
+            if (!centerFlag) {
 
-
-            if(!centerFlag){
-
-                if (!objetiveFlag){
+                if (!objetiveFlag) {
                     cout << "Log Objetive Error Event: " << endl;
                     cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << "None" << endl;
                     cout << "\n" << endl;
+
+                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount], red);
+                    paint = true;
+
                     sequenceCount++;
                 }
 
@@ -1011,34 +1012,62 @@ void foot::matchingCompare(geoproy GeoProy){
                 else if (foundMatchR) cout << "Rigth" << endl;
                 else cout << "Left" << endl;
 
+                GeoProy.countVisRect = 0;
+
                 centerFlag = true;
                 objetiveFlag = false;
             }
 
-        }else{
+        } else {
 
-            if (!objetiveFlag){
-                if (objetive == GeoProy.objetivesG2[sequenceCount]){
+            if (!objetiveFlag) {
+                if (objetive == GeoProy.objetivesG2[sequenceCount]) {
                     cout << "Log Objetive Match Event: Foot ";
                     if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
-                    else cout << "Left" <<  " - Objetivo: " << objetive << endl;
+                    else cout << "Left" << " - Objetivo: " << objetive << endl;
                     cout << "\n" << endl;
+
+                    GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
+                    paint = true;
+
                     centerFlag = false;
                     objetiveFlag = true;
                     sequenceCount++;
-                }else{
+
+                } else {
                     cout << "Log Objetive Error Event: Foot " << endl;
                     if (foundMatchR) cout << "Rigth" << endl;
                     else cout << "Left" << endl;
                     cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << objetive << endl;
                     cout << "\n" << endl;
+
+                    GeoProy.paintMatchOrError(frameAct.processFrame, objetive, red);
+                    paint = true;
+
                     centerFlag = false;
                     objetiveFlag = true;
                     sequenceCount++;
+
                 }
             }
+
         }
     }
+    if(paint){
+        if (GeoProy.countVisRect <= 6 ){
+            if (objetive == GeoProy.objetivesG2[sequenceCount-1]){
+                GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
+                GeoProy.countVisRect += 1;
+            } else{
+                GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount - 1], red);
+                GeoProy.countVisRect += 1;
+            }
+        }else{
+            paint = false;
+        }
+    }
+
+
 
 
 }

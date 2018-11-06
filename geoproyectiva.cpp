@@ -297,15 +297,22 @@ void geoproy::playsToObjetives() {
 
 
 
-void geoproy::paintObjetive(int objetive){
+void geoproy::paintMatchOrError(Mat &image, int objetive, cv::Scalar color){
 
-    playsToObjetives();
+    cv::Point p = calibPointsFloor[objetive];
 
-    cout << "Objetives: " << endl;
-    for (int i = 0; i < numPlays; ++i) { //NOLINT
-        cout << objetivesG2[i] << "-";
-    }
-    cout << endl;
+    const Point* ppt;
+    int hside = 50;
+    cv::Point rook_points[1][4];
+
+    rook_points[0][0] = transformFloor2Image(cv::Point2f(p.x-hside, p.y-hside), homography);
+    rook_points[0][1] = transformFloor2Image(cv::Point2f(p.x+hside, p.y-hside), homography);
+    rook_points[0][2] = transformFloor2Image(cv::Point2f(p.x+hside, p.y+hside), homography);
+    rook_points[0][3] = transformFloor2Image(cv::Point2f(p.x-hside, p.y+hside), homography);
+
+    ppt = {rook_points[0]};
+
+    fillConvexPoly(image, ppt, 4, color, 8, 0);
 
 }
 

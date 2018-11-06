@@ -74,6 +74,7 @@ int main(int argc, char *argv[]){
     cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
 
     geoproyTest.generateSequence(seed);
+    geoproyTest.playsToObjetives();
 
     Foot.maskConvexPoly(geoproyTest);
     Foot.kalmanInit(Foot.Right);
@@ -82,7 +83,7 @@ int main(int argc, char *argv[]){
     QImage edit;
     cv::Mat geopro, img;
 
-    geoproyTest.paintObjetive(1);
+
 
     cout << "\n" << endl;
     cout << "Start Algorithm" << endl;
@@ -161,7 +162,7 @@ int main(int argc, char *argv[]){
             //// Ask Objetives ////
             Foot.askObjetives(geoproyTest);
 
-
+            //// Matching Objetives ////
             Foot.matchingCompare(geoproyTest);
 
 
@@ -188,6 +189,8 @@ int main(int argc, char *argv[]){
 
 //            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
 //            cout << "FoundMatchL: " << Foot.foundMatchL << endl;
+
+            cout << geoproyTest.countVisRect << endl;
 
 
 //            cout << "\n" << endl;

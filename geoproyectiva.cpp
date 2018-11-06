@@ -291,12 +291,6 @@ void geoproy::playsToObjetives() {
     }
 }
 
-
-
-
-
-
-
 void geoproy::paintMatchOrError(Mat &image, int objetive, cv::Scalar color){
 
     cv::Point p = calibPointsFloor[objetive];

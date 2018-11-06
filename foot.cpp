@@ -937,8 +937,6 @@ void foot::askObjetives(geoproy GeoProy){
         foundMatchL = false;
     }
 
-
-
     //// considera hacer codigo especial para el caso del centro
     //// a veces el mono esta al centro con los pies separados no
     //// necesariamente pegados al punto central
@@ -980,8 +978,6 @@ void foot::centerZoneDetection(geoproy GeoProy){
 
 }
 
-
-
 void foot::matchingCompare(geoproy &GeoProy){
 
     int countCenterOutTh = 10;
@@ -1001,7 +997,7 @@ void foot::matchingCompare(geoproy &GeoProy){
                     cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << "None" << endl;
                     cout << "\n" << endl;
 
-                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount], red);
+                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount], blue);
                     paint = true;
 
                     sequenceCount++;
@@ -1041,7 +1037,7 @@ void foot::matchingCompare(geoproy &GeoProy){
                     cout << "Objetivo: " << GeoProy.objetivesG2[sequenceCount] << " - Alcanzado: " << objetive << endl;
                     cout << "\n" << endl;
 
-                    GeoProy.paintMatchOrError(frameAct.processFrame, objetive, red);
+                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount], blue);
                     paint = true;
 
                     centerFlag = false;
@@ -1053,17 +1049,20 @@ void foot::matchingCompare(geoproy &GeoProy){
 
         }
     }
+
     if(paint){
         if (GeoProy.countVisRect <= 6 ){
             if (objetive == GeoProy.objetivesG2[sequenceCount-1]){
                 GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
                 GeoProy.countVisRect += 1;
             } else{
-                GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount - 1], red);
+                GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG2[sequenceCount - 1], blue);
                 GeoProy.countVisRect += 1;
             }
         }else{
             paint = false;
+            GeoProy.countVisRect = 0;
+
         }
     }
 
@@ -1161,12 +1160,12 @@ void foot::drawingResults() {
 
     //// Step Detected ////
     if (step_R) {
-        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], CV_RGB(0, 0, 255), 2);
-        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, orange, -1);
+        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], red, 2);
+        cv::circle(frameAct.resultFrame, centerMeasured_R, 2, red, -1);
     }
     if (step_L) {
-        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], CV_RGB(0, 0, 255), 2);
-        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, ivory, -1);
+        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], red, 2);
+        cv::circle(frameAct.resultFrame, centerMeasured_L, 2, red, -1);
     }
 
 }

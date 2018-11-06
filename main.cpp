@@ -37,13 +37,15 @@ int main(int argc, char *argv[]){
 
     //// UPLA Grabacion 1
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-//    //// Player2
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
-//    int count_test = 1210, count_cal = 0, limit = 5;
-    //// Player3
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-    int count_test = 165+145, count_cal = 0, limit = 5;
-    int seed = 463094935;
+    //// Player2
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
+    int count_test = 1210, count_cal = 0, limit = 5;
+    int seed = 176218894;
+
+//    //// Player3
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+//    int count_test = 165+145, count_cal = 0, limit = 5;
+//    int seed = 463094935;
 
 
 //    //// UPLA Grabacion 2
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
 
-//            cout << substring << endl;
+            cout << substring << endl;
 
         }
 
@@ -190,7 +192,7 @@ int main(int argc, char *argv[]){
 //            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
 //            cout << "FoundMatchL: " << Foot.foundMatchL << endl;
 
-            cout << geoproyTest.countVisRect << endl;
+//            cout << geoproyTest.countVisRect << endl;
 
 
 //            cout << "\n" << endl;

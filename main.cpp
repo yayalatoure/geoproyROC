@@ -30,28 +30,66 @@ int main(int argc, char *argv[]){
     QGuiApplication a(argc, argv);
 
 //    //// Video Original
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/VideoOriginal/CALIB/default_calib1.yml";
 //    string path_cal  = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/CALIBRACION01/*.jpg";
 //    string path_test = "/home/lalo/Dropbox/Proyecto IPD441/Data/Videos/1_CAMARA/TEST01/*.jpg";
-//    int count_test = 195+145, count_cal = 0, limit = 150-145;
+//    int teststart = 195;
+//    int count_test = teststart+145, count_cal = 0, limit = 5;
+//    int seed = 85062514;
 
 
     //// UPLA Grabacion 1
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-    //// Player2
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
-    int count_test = 1210, count_cal = 0, limit = 5;
-    int seed = 176218894;
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
 
-//    //// Player3
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-//    int count_test = 165+145, count_cal = 0, limit = 5;
-//    int seed = 463094935;
+//    //// Player1
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player1/*.jpg";
+//    int count_test = 467, count_cal = 0, limit = 5;
+//    int seed = 1170201133;
+
+//    //// Player2
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player2/*.jpg";
+//    int count_test = 1210, count_cal = 0, limit = 5;
+//    int seed = 176218894;
+
+    //// Player3
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+    int teststart = 165+145;
+    int count_test = teststart, count_cal = 0, limit = 5;
+    int seed = 463094935;
 
 
 //    //// UPLA Grabacion 2
 //    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/default_calib_g2_1.yml";
+//
+//    //// Player 1
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player1/*.jpg";
+//    int count_test = 676, count_cal = 0, limit = 5;
+//    int seed = 6001;
+
+//    //// Player 5
 //    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player5/*.jpg";
-//    int count_test = 582-142, count_cal = 0, limit = 10;
+//    int count_test = 509-30, count_cal = 0, limit = 30;
+//    int seed = 6004;
+
+//    //// Player 6
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player6/*.jpg";
+//    int teststart = 353;
+//    int count_test = teststart-30, count_cal = 0, limit = 30;
+//    int seed = 6005;
+
+
+//    //// UPLA Grabacion 3
+//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada1/*.jpg";
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada1/default_calib.yml";
+//
+//    //// Player 3
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada1/Gabriel-1/*.jpg";
+//    int count_test = 0, count_cal = 0, limit = 10;
+//    int seed = 868094992;
+
+
 
 
     vector<String> filenames_cal, filenames_test;
@@ -68,7 +106,7 @@ int main(int argc, char *argv[]){
     foot Foot(false);
     geoproy geoproyTest(true);
 
-    geoproyTest.readCalibFile();
+    geoproyTest.readCalibFile(fileName);
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
 
@@ -137,7 +175,6 @@ int main(int argc, char *argv[]){
 
             Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 2);
 
-
             //// Measure Foot ////
             Foot.measureFoot(Foot.Right);
             Foot.measureFoot(Foot.Left);
@@ -205,8 +242,6 @@ int main(int argc, char *argv[]){
 
 
 
-
-
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 
 //            cv::imshow("frameAct", Foot.frameAct.resultFrame);
@@ -214,15 +249,13 @@ int main(int argc, char *argv[]){
 
             cv::imshow("geoProy", geopro);
 
+
+            ch = char(cv::waitKey(0));
+
         }
-
-
 
         count_cal++;
         count_test++;
-        ch = char(cv::waitKey(0));
-
-
 
     }
 

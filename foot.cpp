@@ -26,7 +26,7 @@ cv::Scalar foot::blueviolet(226, 43, 138); // NOLINT
 cv::Scalar foot::orange(0, 165, 255);
 
 
-//// Euclidean Distance ////
+//// Euclidean Distance Between ////
 double foot::distance(cv::Point center_kalman, cv::Point center_measured) {
     double dx = 0, dy = 0, result = 0;
     dx = pow(center_kalman.x - center_measured.x, 2);
@@ -197,6 +197,48 @@ void foot::orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vecto
 
 };
 
+void foot::distanceFilterBoxes(){
+
+    cv::Point boxActPoint, boxAntPoint;
+    double distanceToLowerBox;
+    int distanceThreshold = 60;
+
+    vector<Rect> vectorOut;
+
+    vectorOut.clear();
+
+    boxAntPoint.x = frameAnt.segmLowerBox.x + frameAnt.segmLowerBox.width/2;
+    boxAntPoint.y = frameAnt.segmLowerBox.y + frameAnt.segmLowerBox.height/2;
+
+
+
+
+    for (auto &i : frameAct.segmLowerBoxesVector) {
+
+        boxActPoint.x = i.x + i.width/2;
+        boxActPoint.y = i.y + i.height/2;
+
+        distanceToLowerBox = distance(boxActPoint, boxAntPoint);
+
+        if(distanceToLowerBox < distanceThreshold){
+            vectorOut.push_back(i);
+//            cv::rectangle(frameAct.processFrame, i, green, 2);
+//            cv::circle(frameAct.processFrame, boxActPoint, 3, green, -1);
+        }else{
+//            cv::rectangle(frameAct.processFrame, i, red, 2);
+//            cv::circle(frameAct.processFrame, boxActPoint, 3, red, -1);
+        }
+    }
+
+//    cv::circle(frameAct.processFrame, boxAntPoint, 3, blue, -1);
+
+    frameAct.segmLowerBoxesVector.clear();
+    frameAct.segmLowerBoxesVector = vectorOut;
+
+}
+
+
+
 void foot::findLowerBox(){
 
     Rect ROI (0, 0, 1, 1);
@@ -206,7 +248,7 @@ void foot::findLowerBox(){
     double result;
     int threshold = 50;
 
-    if(frameAct.segmLowerBoxesVector.size()>1) {
+    if(!frameAct.segmLowerBoxesVector.empty()) {
         point1.x = frameAct.segmLowerBoxesVector[0].x + frameAct.segmLowerBoxesVector[0].width/2;
         point1.y = frameAct.segmLowerBoxesVector[0].y;
         point2.x = frameAct.segmLowerBoxesVector[1].x + frameAct.segmLowerBoxesVector[1].width/2;
@@ -232,20 +274,31 @@ void foot::findLowerBox(){
             frameAct.segmLowerBox.height = frameAct.segmLowerBoxesVector[0].height;
         }
     }
+
+    distFilterBoxesFlag = true;
 }
 
-void foot::getLowerBox(){
+void foot::getLowerBox() {
 
     frameAct.segmLowerBoxes.clear();
     frameAct.segmLowerBoxesVector.clear();
 
     getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBoxes);
     orderVectorBoxes(frameAct.segmLowerBoxes, frameAct.segmLowerBoxesVector);
+
+//    paintRectanglesVector(frameAct.segmLowerBoxesVector, green);
+
+    if (distFilterBoxesFlag)
+        distanceFilterBoxes();
+
     findLowerBox();
 
 //    cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
 
 }
+
+
+
 
 void foot::zoneDetection(geoproy GeoProy){
 
@@ -265,49 +318,6 @@ void foot::zoneDetection(geoproy GeoProy){
     }
 
 }
-
-/*
-void foot::linearFunctionHeigth(){
-
-    int h = frameAct.segmLowerBox.height;
-    int newHeight;
-
-    double hsizeMax;
-    double hsizeMin;
-    double percentMax;
-
-    switch(platformZone) {
-        case 1 :
-            percentMax = 90.0;
-            hsizeMax = 150.0;
-            hsizeMin = 35.0;
-            break;
-        case 2 :
-            percentMax = 115.0;
-            hsizeMax = 150.0;
-            hsizeMin = 30.0;
-            break;
-        default :
-            percentMax = 70.0;
-            hsizeMax = 150.0;
-            hsizeMin = 40.0;
-    }
-
-    double slope = (percentMax/(hsizeMax-hsizeMin));
-    double intercept = -((percentMax/(hsizeMax-hsizeMin))*hsizeMin);
-
-    if(h > hsizeMin){
-        frameAct.segmCutPercent = slope*h + intercept;
-    }else{
-        frameAct.segmCutPercent = 0;
-    }
-
-    newHeight = int (h * ((100 - frameAct.segmCutPercent)/100));
-    frameAct.segmLowerBox.y += (h - newHeight);
-    frameAct.segmLowerBox.height = newHeight;
-
-}
-*/
 
 void foot::linearFunctionPosY(){
 
@@ -361,7 +371,6 @@ void foot::linearFunctionPosY(){
     frameAct.segmLowerBox.height = newHeight;
 
 }
-
 
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
@@ -423,7 +432,6 @@ void foot::leftrightBoxes(){
 void foot::getFeetBoxes(geoproy GeoProy){
 
     zoneDetection(std::move(GeoProy));
-    //linearFunctionHeigth();
     linearFunctionPosY();
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
@@ -874,8 +882,6 @@ void foot::proyectBoxes() {
 
 
 //// OBJETIVE MATCHING ////
-
-
 
 
 void foot::logMatchingTime(){

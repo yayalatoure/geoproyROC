@@ -27,6 +27,8 @@ class geoproy {
         explicit geoproy(bool start);
 
         //// Read Calib File ////
+        void readCalibFile(QString fileName);
+
         void readCalibFile();
         //// Generate Scene Calibpoints ////
         void genCalibPointsSuelo();

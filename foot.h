@@ -80,6 +80,9 @@ class foot {
 
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
         void orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
+
+        void distanceFilterBoxes();
+
         void findLowerBox();
         void getLowerBox();
 
@@ -167,10 +170,15 @@ class foot {
         //// Bool Atributes ////
         bool start = false;
         bool found;
+
+        bool distFilterBoxesFlag = false;
+
         bool Reset_R;
         bool Reset_L;
         bool step_R;
         bool step_L;
+
+
         bool occlusion;
         bool totalOccR;
         bool totalOccL;

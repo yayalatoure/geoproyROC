@@ -61,43 +61,6 @@ void foot::paintRectanglesVector(vector<Rect> &vectorBoxes, cv::Scalar color){
 
 }
 
-/*
-//// Get Foot Boxes from Blobs and Labels ////
-void foot::getFeet(cv::Mat fg, std::map<int, cv::Rect> &bboxes, cv::Mat labels, cv::Mat labels2, std::map<int, cv::Rect> &fboxes){
-
-    // Selecciona la región conectada más grande
-    int Direc = 0, biggestblob = 1;
-    string Direccion;
-
-    getBlobsBoxes(labels, bboxes); // NOLINT
-
-    for(unsigned int j=0; j < bboxes.size(); j++){
-        if(bboxes[j].area() >= bboxes[biggestblob].area()) biggestblob = j;
-    }
-
-    // Crea una ROI en la parte inferior del jugador para visualizar sólo los
-    // pies y eliminar el resto del análisis.
-
-    Rect ROI;
-    ROI.x = bboxes[biggestblob].x;
-    ROI.y = int( bboxes[biggestblob].y + bboxes[biggestblob].height*0.8);
-    ROI.height = int(bboxes[biggestblob].height*0.5);                       //// porcentaje caja inferior
-    ROI.width = bboxes[biggestblob].width;
-
-    Mat mask = Mat::zeros(fg.size(), CV_8U);
-    rectangle(mask, ROI, Scalar(255), CV_FILLED);
-    Mat fgROI = Mat::zeros(fg.size(), CV_8U);
-
-    // copia fg a fgROI donde mask es distinto de cero.
-    fg.copyTo(fgROI, mask);
-    // aplica componentes conectados otra vez.
-    cv::connectedComponents(fgROI, labels2, 8, CV_32S);
-    getBlobsBoxes(labels2, fboxes);
-
-}
-*/
-
-
 //// Convex Polygon Platform Mask ////
 void foot::maskConvexPoly(geoproy GeoProy){
 
@@ -113,18 +76,34 @@ void foot::segmentation(){
 
     cv::Mat processMasked, foreGround, labels, stats, centroids;
 
+//    //// Grabaciones 1 y 2
+//    double backgroundRatio = 0.6;
+//    double learningRate = 0.004; ////0.005
+//    double varThreshold = 250; //// 210
+//    int    nmixtures = 3;
+//    int    history = 200; ////150
+
+//    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
+//    mog->setNMixtures(nmixtures);
+//    mog->setBackgroundRatio(backgroundRatio);
+//    mog->setShadowValue(0);
+//    mog->setShadowThreshold(0.42);
+//    mog->setDetectShadows(true);
+
+    //// Grabacion 3
     double backgroundRatio = 0.6;
-    double learningRate = 0.004; ////0.005
-    double varThreshold = 250; //// 210
+    double learningRate = 0.0055; ////0.005
+    double varThreshold = 210; //// 210
     int    nmixtures = 3;
-    int    history = 200; ////150
+    int    history = 150; ////150
 
     static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
     mog->setNMixtures(nmixtures);
     mog->setBackgroundRatio(backgroundRatio);
     mog->setShadowValue(0);
-    mog->setShadowThreshold(0.42);
-    mog->setDetectShadows(1);
+    mog->setShadowThreshold(0.36);
+    mog->setDetectShadows(true);
+
 
 
     //// Start Segmentation ////
@@ -132,9 +111,9 @@ void foot::segmentation(){
     frameAct.processFrame.copyTo(processMasked, frameAct.maskConvexPoly);
 
     mog->apply(processMasked, foreGround, 2*learningRate);
-    cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5))); ////(4,6)
+    cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 6))); ////(4,6)
     cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 3))); ////(4,6)
-    cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 8, CV_32S);
+    cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 4, CV_32S);
 
     frameAct.segmentedFrame  =  foreGround.clone();
     frameAct.labelsFrame = labels.clone();
@@ -187,13 +166,6 @@ void foot::orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vecto
     }
 
     std::sort(vectorBoxes.begin(), vectorBoxes.end(), byArea());
-    /*
-    cout << "footBoxesVector.size: " << vectorBoxes.size() << endl;
-    cout << "Areas ordenadas: " << endl;
-    for (int i = 0; i < vectorBoxes.size() ; ++i) {
-        cout << vectorBoxes[i].area() << endl;
-    }
-    */
 
 };
 
@@ -236,8 +208,6 @@ void foot::distanceFilterBoxes(){
     frameAct.segmLowerBoxesVector = vectorOut;
 
 }
-
-
 
 void foot::findLowerBox(){
 
@@ -299,8 +269,8 @@ void foot::getLowerBox() {
 
 
 
-
-void foot::zoneDetection(geoproy GeoProy){
+//// Grabacion 1 y 2
+void foot::zoneDetectionG2(geoproy GeoProy){
 
     cv::Point2f lowPointImage;
 
@@ -318,8 +288,8 @@ void foot::zoneDetection(geoproy GeoProy){
     }
 
 }
-
-void foot::linearFunctionPosY(){
+//// Grabacion 1 y 2
+void foot::linearFunctionPosYG2() {
 
     int h = frameAct.segmLowerBox.height;
     int y = frameAct.lowPointFloor.y;
@@ -358,6 +328,82 @@ void foot::linearFunctionPosY(){
             slope = (percentMax3-percentMax2)/(yMax3-yMin3);
             intercept = percentMax2-((percentMax3-percentMax2)/(yMax3-yMin3))*yMin3;
 
+    }
+
+    if(h > hsizeMin){
+        frameAct.segmCutPercent = slope*y + intercept;
+    }else{
+        frameAct.segmCutPercent = 0;
+    }
+
+    newHeight = int (h * ((100 - frameAct.segmCutPercent)/100));
+    frameAct.segmLowerBox.y += (h - newHeight);
+    frameAct.segmLowerBox.height = newHeight;
+
+}
+
+
+
+//// Grabacion 3
+void foot::zoneDetectionG3(geoproy GeoProy){
+
+    cv::Point2f lowPointImage;
+
+    lowPointImage.x = frameAct.segmLowerBox.x + frameAct.segmLowerBox.width/2; // NOLINT
+    lowPointImage.y = frameAct.segmLowerBox.y + frameAct.segmLowerBox.height;
+
+    frameAct.lowPointFloor = GeoProy.transformFloor2Image(lowPointImage, GeoProy.homographyInv); // NOLINT
+
+    if (frameAct.lowPointFloor.y >= 50) {
+        platformZone = 1;
+    }else if (frameAct.lowPointFloor.y < 50 && frameAct.lowPointFloor.y > -100){
+        platformZone = 2;
+    } else {
+        platformZone = 3;
+    }
+
+}
+
+//// Grabacion 3
+void foot::linearFunctionPosYG3(){
+
+
+    int h = frameAct.segmLowerBox.height;
+    int y = frameAct.lowPointFloor.y;
+    int newHeight;
+    double slope, intercept;
+
+    //MinHeight
+    int  hsizeMin = 35;
+
+    //Zone1
+    double percentMax1 = 30.0;
+    double yMin1 = 50.0;
+    double yMax1 = 300.0;
+
+    //Zone2
+    double percentMax2 = 80.0;
+    double yMin2 = -100.0;
+    double yMax2 = 50.0;
+
+    //Zone3
+    double percentMax3 = 75.0;
+    double yMin3 = -300.0;
+    double yMax3 = -100.0;
+
+    switch(platformZone) {
+        case 1 :
+            slope = (percentMax1/(yMax1-yMin1));
+            intercept = -((percentMax1/(yMax1-yMin1))*yMin1);
+            break;
+        case 2 :
+            slope = (percentMax2-percentMax1)/(yMax2-yMin2);
+            intercept = percentMax1-((percentMax2-percentMax1)/(yMax2-yMin2))*yMin2;
+            break;
+        default :
+            percentMax2 = 60.0;
+            slope = (percentMax3-percentMax2)/(yMax3-yMin3);
+            intercept = percentMax2-((percentMax3-percentMax2)/(yMax3-yMin3))*yMin3;
     }
 
     if(h > hsizeMin){
@@ -431,8 +477,8 @@ void foot::leftrightBoxes(){
 
 void foot::getFeetBoxes(geoproy GeoProy){
 
-    zoneDetection(std::move(GeoProy));
-    linearFunctionPosY();
+    zoneDetectionG3(std::move(GeoProy));
+    linearFunctionPosYG3();
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
     rectangle(mask, frameAct.segmLowerBox, Scalar(255), CV_FILLED);

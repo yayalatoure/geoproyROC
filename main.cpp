@@ -38,9 +38,9 @@ int main(int argc, char *argv[]){
 //    int seed = 85062514;
 
 
-    //// UPLA Grabacion 1
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
+//    //// UPLA Grabacion 1
+//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
 
 //    //// Player1
 //    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player1/*.jpg";
@@ -52,11 +52,11 @@ int main(int argc, char *argv[]){
 //    int count_test = 1210, count_cal = 0, limit = 5;
 //    int seed = 176218894;
 
-    //// Player3
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
-    int teststart = 165+145;
-    int count_test = teststart, count_cal = 0, limit = 5;
-    int seed = 463094935;
+//    //// Player3
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/Player3/*.jpg";
+//    int teststart = 165+145;
+//    int count_test = teststart, count_cal = 0, limit = 5;
+//    int seed = 463094935;
 
 
 //    //// UPLA Grabacion 2
@@ -80,16 +80,25 @@ int main(int argc, char *argv[]){
 //    int seed = 6005;
 
 
-//    //// UPLA Grabacion 3
-//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada1/*.jpg";
-//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada1/default_calib.yml";
-//
-//    //// Player 3
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada1/Gabriel-1/*.jpg";
+    //// UPLA Grabacion 3
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada2/default_calib.yml";
+
+//    //// Player 1
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada2/Fabian-2/*.jpg";
 //    int count_test = 0, count_cal = 0, limit = 10;
 //    int seed = 868094992;
 
 
+//    //// Player 2
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada1/Hector-2/*.jpg";
+//    int count_test = 0, count_cal = 0, limit = 10;
+//    int seed = 868094992;
+
+    //// Player 3
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Gabriel-3/*.jpg";
+    int count_test = 0, count_cal = 0, limit = 10;
+    int seed = 254894743;
 
 
     vector<String> filenames_cal, filenames_test;
@@ -245,7 +254,7 @@ int main(int argc, char *argv[]){
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 
 //            cv::imshow("frameAct", Foot.frameAct.resultFrame);
-//            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
+            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
 
             cv::imshow("geoProy", geopro);
 

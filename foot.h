@@ -87,9 +87,11 @@ class foot {
         void getLowerBox();
 
 
-        void zoneDetection(geoproy GeoProy);
-        void linearFunctionHeigth();
-        void linearFunctionPosY();
+        void zoneDetectionG2(geoproy GeoProy);
+        void zoneDetectionG3(geoproy GeoProy);
+
+        void linearFunctionPosYG2();
+        void linearFunctionPosYG3();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
         void getFeetBoxes(geoproy GeoProy);
         void leftrightBoxes();

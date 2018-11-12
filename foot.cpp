@@ -76,33 +76,33 @@ void foot::segmentation(){
 
     cv::Mat processMasked, foreGround, labels, stats, centroids;
 
-//    //// Grabaciones 1 y 2
-//    double backgroundRatio = 0.6;
-//    double learningRate = 0.004; ////0.005
-//    double varThreshold = 250; //// 210
-//    int    nmixtures = 3;
-//    int    history = 200; ////150
-
-//    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
-//    mog->setNMixtures(nmixtures);
-//    mog->setBackgroundRatio(backgroundRatio);
-//    mog->setShadowValue(0);
-//    mog->setShadowThreshold(0.42);
-//    mog->setDetectShadows(true);
-
-    //// Grabacion 3
+    //// Grabaciones 1 y 2
     double backgroundRatio = 0.6;
-    double learningRate = 0.0055; ////0.005
-    double varThreshold = 210; //// 210
+    double learningRate = 0.004; ////0.005
+    double varThreshold = 250; //// 210
     int    nmixtures = 3;
-    int    history = 150; ////150
+    int    history = 200; ////150
 
     static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
     mog->setNMixtures(nmixtures);
     mog->setBackgroundRatio(backgroundRatio);
     mog->setShadowValue(0);
-    mog->setShadowThreshold(0.36);
+    mog->setShadowThreshold(0.42);
     mog->setDetectShadows(true);
+
+//    //// Grabacion 3
+//    double backgroundRatio = 0.6;
+//    double learningRate = 0.0055; ////0.005
+//    double varThreshold = 210; //// 210
+//    int    nmixtures = 3;
+//    int    history = 150; ////150
+//
+//    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
+//    mog->setNMixtures(nmixtures);
+//    mog->setBackgroundRatio(backgroundRatio);
+//    mog->setShadowValue(0);
+//    mog->setShadowThreshold(0.36);
+//    mog->setDetectShadows(true);
 
 
 
@@ -181,9 +181,6 @@ void foot::distanceFilterBoxes(){
 
     boxAntPoint.x = frameAnt.segmLowerBox.x + frameAnt.segmLowerBox.width/2;
     boxAntPoint.y = frameAnt.segmLowerBox.y + frameAnt.segmLowerBox.height/2;
-
-
-
 
     for (auto &i : frameAct.segmLowerBoxesVector) {
 
@@ -343,7 +340,7 @@ void foot::linearFunctionPosYG2() {
 }
 
 
-
+/*
 //// Grabacion 3
 void foot::zoneDetectionG3(geoproy GeoProy){
 
@@ -417,6 +414,8 @@ void foot::linearFunctionPosYG3(){
     frameAct.segmLowerBox.height = newHeight;
 
 }
+*/
+
 
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
@@ -477,8 +476,8 @@ void foot::leftrightBoxes(){
 
 void foot::getFeetBoxes(geoproy GeoProy){
 
-    zoneDetectionG3(std::move(GeoProy));
-    linearFunctionPosYG3();
+    zoneDetectionG2(std::move(GeoProy));
+    linearFunctionPosYG2();
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
     rectangle(mask, frameAct.segmLowerBox, Scalar(255), CV_FILLED);
@@ -544,7 +543,6 @@ void foot::measureFoot(int pie){
 
 
 //// KALMAN FILTER ////
-
 
 //// Kalman Initialization////
 void foot::kalmanInit(int pie){
@@ -942,7 +940,19 @@ void foot::logMatchingErrorTime(){
 
 }
 
+//// Center Special Case Match ////
+void foot::centerSpecialCase(cv::Point stepR, cv::Point stepL){
 
+    bool stepRIn, stepLIn;
+
+    stepRIn = stepR.x > -50 && stepR.x < 50 && stepR.y > -50 && stepR.y < 50;
+    stepLIn = stepL.x > -50 && stepL.x < 50 && stepL.y > -50 && stepL.y < 50;
+
+    centerSpecialFlag = stepRIn && stepLIn && stepR.x < 0 && stepL.x > 0;
+
+    //// agregar echo de que puede haber una caja solamente (ocultamiento) y sombra
+
+}
 
 //// Ask which objetive is near of step given ////
 void foot::askObjetives(geoproy GeoProy){
@@ -951,13 +961,13 @@ void foot::askObjetives(geoproy GeoProy){
     double objetiveThreshold = 35;
     double resultDistance;
 
-    cv::Point stepPoint;
+    cv::Point stepPointR, stepPointL;
 
     //// para cada paso R verifico si el punto esta en algun objetivo
     if (step_R){
-        stepPoint = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
+        stepPointR = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
         for (int i = 1; i <= totalObjetives; ++i) {
-            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            resultDistance = distance(stepPointR, GeoProy.calibPointsFloor[i]);
             if (resultDistance < objetiveThreshold){
                 objetive = i;
                 foundMatchR = true;
@@ -972,10 +982,10 @@ void foot::askObjetives(geoproy GeoProy){
 
 
     if (step_L){
-        stepPoint = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
+        stepPointL = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
 //        cout << "StepPoint L: " << stepPoint << endl;
         for (int i = 1; i <= totalObjetives; ++i) {
-            resultDistance = distance(stepPoint, GeoProy.calibPointsFloor[i]);
+            resultDistance = distance(stepPointL, GeoProy.calibPointsFloor[i]);
             if (resultDistance < objetiveThreshold){
 //                cout << "Objetivo Reach L: " << i << endl;
                 objetive = i;
@@ -988,6 +998,16 @@ void foot::askObjetives(geoproy GeoProy){
     }else{
         foundMatchL = false;
     }
+
+    if(step_R || step_L){
+
+        stepPointR = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
+        stepPointL = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
+
+        centerSpecialCase(stepPointR, stepPointL);
+
+    }
+
 
     //// considera hacer codigo especial para el caso del centro
     //// a veces el mono esta al centro con los pies separados no
@@ -1038,9 +1058,9 @@ void foot::matchingCompare(geoproy &GeoProy){
         centerFlag = false;
     }
 
-    if (foundMatchR || foundMatchL) {
+    if (foundMatchR || foundMatchL || centerSpecialFlag) {
 
-        if (objetive == 5) {
+        if (objetive == 5 || centerSpecialFlag) {
 
             if (!centerFlag) {
 

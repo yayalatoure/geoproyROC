@@ -74,22 +74,15 @@ class foot {
 
         //// Segmentation & ROI (footBoxes) ////
         void maskConvexPoly(geoproy GeoProy);
-
         void segmentation();
-        //void findFootBoxes();
-
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
         void orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
-
         void distanceFilterBoxes();
-
         void findLowerBox();
         void getLowerBox();
 
-
         void zoneDetectionG2(geoproy GeoProy);
         void zoneDetectionG3(geoproy GeoProy);
-
         void linearFunctionPosYG2();
         void linearFunctionPosYG3();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
@@ -113,8 +106,6 @@ class foot {
 
         //// Generate Template ////
         void generateTemplateNp();
-
-
         //// Partial Occlusion ////
         void matchingScorePocc();
         //// Occlusion Type ////
@@ -131,6 +122,7 @@ class foot {
         void logMatchingTime();
         void logMatchingErrorTime();
 
+        void centerSpecialCase(cv::Point stepR, cv::Point stepL);
         void askObjetives(geoproy GeoProy);
         void centerZoneDetection(geoproy GeoProy);
 
@@ -188,6 +180,7 @@ class foot {
         bool foundMatchR = false;
         bool foundMatchL = false;
         bool centerFlag = false;
+        bool centerSpecialFlag= false;
         bool objetiveFlag = true;
         bool paint = false;
 

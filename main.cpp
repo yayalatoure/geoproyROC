@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
 //    int seed = 85062514;
 
 
-//    //// UPLA Grabacion 1
+    //// UPLA Grabacion 1
 //    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/CAL_Test1/*.jpg";
 //    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion1/default_calib.yml";
 
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 
 
     //// UPLA Grabacion 2
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/default_calib_g2_1.yml";
+//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/CAL1/*.jpg";
+//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/CALIB/default_calib_g2_2.yml";
 
 //    //// Player 1
 //    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player1/*.jpg";
@@ -73,32 +73,23 @@ int main(int argc, char *argv[]){
 //    int count_test = 509-30, count_cal = 0, limit = 30;
 //    int seed = 6004;
 
-    //// Player 6
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player6/*.jpg";
-    int teststart = 353;
-    int count_test = teststart-30, count_cal = 0, limit = 30;
-    int seed = 6005;
+//    //// Player 6
+//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player6/*.jpg";
+//    int teststart = 353;
+//    int count_test = teststart-30, count_cal = 0, limit = 30;
+//    int seed = 6005;
 
 
-//    //// UPLA Grabacion 3
-//    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
-//    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada2/default_calib.yml";
+    //// UPLA Grabacion 3
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/default_calib.yml";
 
-//    //// Player 1
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada2/Fabian-2/*.jpg";
-//    int count_test = 0, count_cal = 0, limit = 10;
-//    int seed = 868094992;
+    //// Player 2
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Fabian-3/*.jpg";
+    int count_test = 0, count_cal = 0, limit = 10;
+    int seed = 73832449;
 
 
-//    //// Player 2
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada1/Hector-2/*.jpg";
-//    int count_test = 0, count_cal = 0, limit = 10;
-//    int seed = 868094992;
-
-//    //// Player 3
-//    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Gabriel-3/*.jpg";
-//    int count_test = 0, count_cal = 0, limit = 10;
-//    int seed = 254894743;
 
 
     vector<String> filenames_cal, filenames_test;
@@ -232,7 +223,7 @@ int main(int argc, char *argv[]){
 //            cout << "StepR : " << Foot.step_R << endl;
 //            cout << "StepL : " << Foot.step_L << endl;
 
-//            cout << "CenterFlag: " << Foot.centerFlag << endl;
+
 //            cout << "CountCenterOut: " << Foot.countCenterOut << endl;
 
 //            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
@@ -241,6 +232,8 @@ int main(int argc, char *argv[]){
 //            cout << geoproyTest.countVisRect << endl;
 
             cout << "CenterSpecialFlag: " << Foot.centerSpecialFlag << endl;
+            cout << "CenterFlag: " << Foot.centerFlag << endl;
+            cout << "countCenterOut: " << Foot.countCenterOut << endl;
 
 //            cout << "\n" << endl;
 

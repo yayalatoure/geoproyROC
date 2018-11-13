@@ -59,8 +59,9 @@ typedef struct {
     map<int, Rect> segmLowerBoxes;
     vector<Rect>   segmLowerBoxesVector;
 
-    Rect   segmLowerBox;
-    Point  lowPointFloor;
+    cv::Rect   segmLowerBox;
+    cv::Rect   segmLowerBoxFL;
+    cv::Point  lowPointFloor;
     double segmCutPercent;
 
 } ImageBoxes;
@@ -180,7 +181,7 @@ class foot {
         bool foundMatchR = false;
         bool foundMatchL = false;
         bool centerFlag = false;
-        bool centerSpecialFlag= false;
+        bool centerSpecialFlag = true;
         bool objetiveFlag = true;
         bool paint = false;
 

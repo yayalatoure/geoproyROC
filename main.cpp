@@ -81,15 +81,13 @@ int main(int argc, char *argv[]){
 
 
     //// UPLA Grabacion 3
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/default_calib.yml";
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/default_calib.yml";
 
-    //// Player 2
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Fabian-3/*.jpg";
+    //// Player
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Hector-3/*.jpg";
     int count_test = 0, count_cal = 0, limit = 10;
-    int seed = 73832449;
-
-
+    int seed = 424457088;
 
 
     vector<String> filenames_cal, filenames_test;
@@ -206,6 +204,8 @@ int main(int argc, char *argv[]){
 
 
 
+
+
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
             Foot.drawingResults();
@@ -213,29 +213,31 @@ int main(int argc, char *argv[]){
             img = Foot.frameAct.resultFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
             geoproyTest.addCalibPoints(edit);
-            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*)edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
+            geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*) edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
 
 
-//            cout << "Zone?: " << Foot.platformZone << endl;
-//            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
-//            cout << "Occlusion?: " << Foot.occlusion << endl;
-
-//            cout << "StepR : " << Foot.step_R << endl;
-//            cout << "StepL : " << Foot.step_L << endl;
-
-
-//            cout << "CountCenterOut: " << Foot.countCenterOut << endl;
-
-//            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
-//            cout << "FoundMatchL: " << Foot.foundMatchL << endl;
-
-//            cout << geoproyTest.countVisRect << endl;
-
+            //// COUTS ////
+            /*
+            cout << "Zone?: " << Foot.platformZone << endl;
+            cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
+            cout << "Occlusion?: " << Foot.occlusion << endl;
+            cout << "StepR : " << Foot.step_R << endl;
+            cout << "StepL : " << Foot.step_L << endl;
+            cout << "CountCenterOut: " << Foot.countCenterOut << endl;
+            cout << "FoundMatchR: " << Foot.foundMatchR << endl;
+            cout << "FoundMatchL: " << Foot.foundMatchL << endl;
+            cout << geoproyTest.countVisRect << endl;
             cout << "CenterSpecialFlag: " << Foot.centerSpecialFlag << endl;
             cout << "CenterFlag: " << Foot.centerFlag << endl;
             cout << "countCenterOut: " << Foot.countCenterOut << endl;
+            cout << "\n" << endl;
+             */
+            //cout << "Width R: " << Foot.frameAct.footBoxes[Foot.Right].width << endl;
+            //cout << "Width L: " << Foot.frameAct.footBoxes[Foot.Left].width << endl;
 
-//            cout << "\n" << endl;
+
+
+
 
         } else{
             if(Foot.frameAct.processFrame.data){

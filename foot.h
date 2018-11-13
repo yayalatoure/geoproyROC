@@ -62,7 +62,12 @@ typedef struct {
     cv::Rect   segmLowerBox;
     cv::Rect   segmLowerBoxFL;
     cv::Point  lowPointFloor;
-    double segmCutPercent;
+    double     segmCutPercent;
+
+    //// Foots to Objetive Matching ////
+    cv::Point leftFoot;
+    cv::Point rightFoot;
+
 
 } ImageBoxes;
 
@@ -100,6 +105,8 @@ class foot {
         void kalmanPredict(int pie, int dT);
         void kalmanResetStep(int pie);
         void kalmanUpdate(int pie);
+
+        void stepPrecision(int pie);
 
         //// Measure Error ////
         double distance(cv::Point center_kalman, cv::Point center_measured);

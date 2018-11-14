@@ -226,7 +226,6 @@ int main(int argc, char *argv[]){
             cout << "CountCenterOut: " << Foot.countCenterOut << endl;
             cout << "FoundMatchR: " << Foot.foundMatchR << endl;
             cout << "FoundMatchL: " << Foot.foundMatchL << endl;
-            cout << geoproyTest.countVisRect << endl;
             cout << "CenterSpecialFlag: " << Foot.centerSpecialFlag << endl;
             cout << "CenterFlag: " << Foot.centerFlag << endl;
             cout << "countCenterOut: " << Foot.countCenterOut << endl;

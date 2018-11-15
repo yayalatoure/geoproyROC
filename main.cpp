@@ -81,13 +81,13 @@ int main(int argc, char *argv[]){
 
 
     //// UPLA Grabacion 3
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/default_calib.yml";
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada3/default_calib.yml";
 
     //// Player
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Hector-3/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada2/Hector-2/*.jpg";
     int count_test = 0, count_cal = 0, limit = 10;
-    int seed = 424457088;
+    int seed = 291078514;
 
 
     vector<String> filenames_cal, filenames_test;
@@ -204,8 +204,6 @@ int main(int argc, char *argv[]){
 
 
 
-
-
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
             Foot.drawingResults();
@@ -230,12 +228,11 @@ int main(int argc, char *argv[]){
             cout << "CenterFlag: " << Foot.centerFlag << endl;
             cout << "countCenterOut: " << Foot.countCenterOut << endl;
             cout << "\n" << endl;
+
+            cout << "Width R: " << Foot.frameAct.footBoxes[Foot.Right].width << endl;
+            cout << "Width L: " << Foot.frameAct.footBoxes[Foot.Left].width << endl;
+
              */
-            //cout << "Width R: " << Foot.frameAct.footBoxes[Foot.Right].width << endl;
-            //cout << "Width L: " << Foot.frameAct.footBoxes[Foot.Left].width << endl;
-
-
-
 
 
         } else{

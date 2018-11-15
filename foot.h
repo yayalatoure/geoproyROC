@@ -65,6 +65,8 @@ typedef struct {
     double     segmCutPercent;
 
     //// Foots to Objetive Matching ////
+    cv::Rect  leftRectFoot;
+    cv::Rect  rightRectFoot;
     cv::Point leftFoot;
     cv::Point rightFoot;
 

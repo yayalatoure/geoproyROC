@@ -172,6 +172,10 @@ void foot::orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vecto
 
 };
 
+
+
+
+
 void foot::distanceFilterBoxes(){
 
     cv::Point boxActPoint, boxAntPoint;
@@ -202,12 +206,15 @@ void foot::distanceFilterBoxes(){
         }
     }
 
-    cv::circle(frameAct.processFrame, boxAntPoint, 3, blue, -1);
+    //cv::circle(frameAct.processFrame, boxAntPoint, 3, blue, -1);
 
     frameAct.segmLowerBoxesVector.clear();
     frameAct.segmLowerBoxesVector = vectorOut;
 
 }
+
+
+
 
 void foot::findLowerBox(){
 
@@ -262,12 +269,7 @@ void foot::getLowerBox() {
 
     findLowerBox();
 
-    //cv::rectangle(frameAct.processFrame, frameAct.segmLowerBox, cyan, 2);
-    //cv::circle(frameAct.processFrame, (frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
-
 }
-
-
 
 //// Grabacion 1 y 2
 /*
@@ -347,7 +349,6 @@ void foot::linearFunctionPosYG2() {
 }
 */
 
-
 //// Grabacion 3
 void foot::zoneDetectionG3(geoproy GeoProy){
 
@@ -426,8 +427,6 @@ void foot::linearFunctionPosYG3(){
 
 }
 
-
-
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
     std::map<int, cv::Rect> areaFiltered, sideFilteredH, sideFilteredW;
@@ -458,7 +457,7 @@ void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
 void foot::leftrightBoxes(){
 
-    int Rigth = 2;
+    int Right = 2;
     int Left  = 1;
     auto boxesSize = frameAct.footBoxes.size();
 
@@ -468,15 +467,21 @@ void foot::leftrightBoxes(){
 
             break;
         case 2 :
-            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
+            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
+            frameAct.leftRectFoot = frameAct.footBoxes[Left];
+            frameAct.rightRectFoot = frameAct.footBoxes[Left];
             break;
         case 3 :
-            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
-            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
+            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
+            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
+            frameAct.leftRectFoot = frameAct.footBoxes[Left];
+            frameAct.rightRectFoot = frameAct.footBoxes[Right];
             break;
         default :
-            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
-            cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
+            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
+            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
+            frameAct.leftRectFoot = frameAct.footBoxes[Left];
+            frameAct.rightRectFoot = frameAct.footBoxes[Right];
             break;
     }
 
@@ -490,8 +495,8 @@ void foot::getFeetBoxes(geoproy GeoProy){
     linearFunctionPosYG3();
 
     //// dibujando caja menor ////
-    cv::rectangle(frameAct.processFrame, frameAct.segmLowerBoxFL, cyan, 2);
-    cv::circle(frameAct.processFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
+    //cv::rectangle(frameAct.processFrame, frameAct.segmLowerBoxFL, cyan, 2);
+    //cv::circle(frameAct.processFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
 
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
@@ -545,7 +550,6 @@ void foot::measureFoot(int pie){
         }
     }
 }
-
 
 
 
@@ -983,8 +987,6 @@ void foot::logMatchingErrorTime(){
 
 }
 
-
-
 //// Center Special Case Match ////
 void foot::centerSpecialCase(cv::Point stepR, cv::Point stepL){
 
@@ -1223,16 +1225,43 @@ void foot::matchingCompare(geoproy &GeoProy){
 
 
 
-
-
-
 //// DRAW RESULTS ////
-
 
 //// Draw Results to Image ////
 void foot::drawingResults() {
 
+    cv::circle(frameAct.resultFrame, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
 
+    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBox, cyan, 2);
+    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
+
+    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBoxFL, cyan, 2);
+    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
+
+    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
+    cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
+
+
+    //// Step Detected or Kalman Filter////
+    if (step_R) {
+        cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
+        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
+    }else{
+        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
+        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
+    }
+    if (step_L) {
+        cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
+        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
+    }else{
+        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
+        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
+    }
+
+
+
+
+    /*
     //// Foots Rectangles ////
     //paintRectangles(frameAct.resultFrame, frameAct.footBoxes, green);
 
@@ -1310,17 +1339,7 @@ void foot::drawingResults() {
 //    }
 
 
-
-    //// Step Detected ////
-    if (step_R) {
-        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Right], blue, 2);
-        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
-    }
-    if (step_L) {
-        cv::rectangle(frameAct.resultFrame, frameAct.footBoxes[Left], blue, 2);
-        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
-    }
-
+     */
 
 
 }

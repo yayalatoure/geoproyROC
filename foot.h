@@ -89,25 +89,18 @@ class foot {
         void findLowerBox();
         void getLowerBox();
 
-        void zoneDetectionG2(geoproy GeoProy);
         void zoneDetectionG3(geoproy GeoProy);
-        void linearFunctionPosYG2();
         void linearFunctionPosYG3();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
         void getFeetBoxes(geoproy GeoProy);
         void leftrightBoxes();
 
-        //void getFeet(Mat fg, map<int, Rect> &bboxes, Mat labels, Mat labels2, map<int, Rect> &fboxes);
-
-        //// Measure Foot No Occluded Case ////
-        void measureFoot(int pie);
 
         //// Kalman Filter ////
         void kalmanInit(int pie);
         void kalmanPredict(int pie, int dT);
         void kalmanResetStep(int pie);
         void kalmanUpdate(int pie);
-
         void stepPrecision(int pie);
 
         //// Measure Error ////
@@ -132,11 +125,9 @@ class foot {
         void logMatchingTime();
         void logMatchingErrorTime();
 
-        void centerSpecialCase(cv::Point stepR, cv::Point stepL);
         void askObjetives(geoproy GeoProy);
-        void centerZoneDetection(geoproy GeoProy);
-
-        void matchingCompare(geoproy &GeoProy);
+        void centerOutCountFlag(geoproy GeoProy);
+        void stateMachine(geoproy &GeoProy);
 
 
 
@@ -149,30 +140,24 @@ class foot {
         void clearVariables();
 
 
-//        template <class T>
-//        bool findValue(const cv::Mat &mat, T value);
-
-
-
     public:
 
         //// Int Atributes ////
         int Right = 1;
         int Left = 2;
         int rowsIm = 480; int colsIm = 640;
-//        int rowsIm = 304; int colsIm = 400;
-
-
-
         int platformZone = 2;
         int objetive;
+        int stopCount = 0;
         int sequenceCount = 0;
         int countCenterOut = 0;
 
 
 
+
         //// Bool Atributes ////
         bool start = false;
+        bool stop = false;
         bool found;
 
         bool distFilterBoxesFlag = false;
@@ -182,14 +167,22 @@ class foot {
         bool step_R;
         bool step_L;
 
-
         bool occlusion;
         bool totalOccR;
         bool totalOccL;
 
+        bool init = true;
+        bool center, entre, objet;
+        bool betweenFromCenter, betweenFromObjet;
+
+
+
         bool foundMatchR = false;
         bool foundMatchL = false;
-        bool centerFlag = false;
+        bool centerFlagWasOut = false;
+        bool centerFlagIsIn = true;
+
+
         bool centerSpecialFlag = true;
         bool objetiveFlag = true;
         bool paint = false;

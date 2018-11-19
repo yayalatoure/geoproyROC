@@ -130,7 +130,7 @@ struct byArea {
     }
 };
 
-//// Get Bigger Blobs of Segmentation Image ////
+//// Grabacion 3 ////
 void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
 
     int ro = labels.rows, co = labels.cols;
@@ -172,10 +172,6 @@ void foot::orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vecto
 
 };
 
-
-
-
-
 void foot::distanceFilterBoxes(){
 
     cv::Point boxActPoint, boxAntPoint;
@@ -212,9 +208,6 @@ void foot::distanceFilterBoxes(){
     frameAct.segmLowerBoxesVector = vectorOut;
 
 }
-
-
-
 
 void foot::findLowerBox(){
 
@@ -271,85 +264,6 @@ void foot::getLowerBox() {
 
 }
 
-//// Grabacion 1 y 2
-/*
-void foot::zoneDetectionG2(geoproy GeoProy){
-
-    cv::Point2f lowPointImage;
-
-    lowPointImage.x = frameAct.segmLowerBox.x + frameAct.segmLowerBox.width/2; // NOLINT
-    lowPointImage.y = frameAct.segmLowerBox.y + frameAct.segmLowerBox.height;
-
-    frameAct.lowPointFloor = GeoProy.transformFloor2Image(lowPointImage, GeoProy.homographyInv); // NOLINT
-
-    if (frameAct.lowPointFloor.y <= -50) {
-        platformZone = 1;
-    }else if (frameAct.lowPointFloor.y > -50 && frameAct.lowPointFloor.y <= 100){
-        platformZone = 2;
-    } else{
-        platformZone = 3;
-    }
-
-}
-//// Grabacion 1 y 2
-void foot::linearFunctionPosYG2() {
-
-    int h = frameAct.segmLowerBox.height;
-    int y = frameAct.lowPointFloor.y;
-    int newHeight;
-    double slope, intercept;
-
-    //MinHeight
-    int  hsizeMin = 30;
-
-    //Zone1
-    double percentMax1 = 30.0;
-    double yMin1 = -300.0;
-    double yMax1 = -50.0;
-
-    //Zone2
-    double percentMax2 = 75.0;
-    double yMin2 = -50.0;
-    double yMax2 = 100.0;
-
-    //Zone3
-    double percentMax3 = 78.0;
-    double yMin3 = 100.0;
-    double yMax3 = 300.0;
-
-    switch(platformZone) {
-        case 1 :
-            slope = (percentMax1/(yMax1-yMin1));
-            intercept = -((percentMax1/(yMax1-yMin1))*yMin1);
-            break;
-        case 2 :
-            slope = (percentMax2-percentMax1)/(yMax2-yMin2);
-            intercept = percentMax1-((percentMax2-percentMax1)/(yMax2-yMin2))*yMin2;
-            break;
-        default :
-            percentMax2 = 60.0;
-            slope = (percentMax3-percentMax2)/(yMax3-yMin3);
-            intercept = percentMax2-((percentMax3-percentMax2)/(yMax3-yMin3))*yMin3;
-
-    }
-
-    if(h > hsizeMin){
-        frameAct.segmCutPercent = slope*y + intercept;
-    }else{
-        frameAct.segmCutPercent = 0;
-    }
-
-
-    newHeight = int (h * ((100 - frameAct.segmCutPercent)/100));
-
-    frameAct.segmLowerBoxFL = frameAct.segmLowerBox;
-    frameAct.segmLowerBoxFL.y += (h - newHeight);
-    frameAct.segmLowerBoxFL.height = newHeight;
-
-}
-*/
-
-//// Grabacion 3
 void foot::zoneDetectionG3(geoproy GeoProy){
 
     cv::Point2f lowPointImage;
@@ -369,7 +283,6 @@ void foot::zoneDetectionG3(geoproy GeoProy){
 
 }
 
-//// Grabacion 3
 void foot::linearFunctionPosYG3(){
 
 
@@ -430,7 +343,7 @@ void foot::linearFunctionPosYG3(){
 void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
 
     std::map<int, cv::Rect> areaFiltered, sideFilteredH, sideFilteredW;
-    int thresholdArea = 100;
+    int thresholdArea = 80;
     int thresholdSideH = 8;
     int thresholdSideW = 5;
 
@@ -453,39 +366,45 @@ void foot::areasideFilter(std::map<int, cv::Rect> &bboxes){
     for (int l = 0; l < sideFilteredW.size(); ++l) {
         bboxes[l] = sideFilteredW[l];
     }
+
+//    cout << bboxes.size() << endl;
 }
 
 void foot::leftrightBoxes(){
 
-    int Right = 2;
-    int Left  = 1;
+    int Right = 1;
+    int Left  = 2;
     auto boxesSize = frameAct.footBoxes.size();
-
 
     switch(boxesSize) {
         case 1 :
 
             break;
         case 2 :
-            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
-            frameAct.leftRectFoot = frameAct.footBoxes[Left];
-            frameAct.rightRectFoot = frameAct.footBoxes[Left];
+            frameAct.rightRectFoot = frameAct.footBoxes[Right];
+            frameAct.leftRectFoot = frameAct.footBoxes[Right];
+            centerMeasured_R.x = frameAct.rightRectFoot.x + frameAct.rightRectFoot.width / 2;
+            centerMeasured_R.y = frameAct.rightRectFoot.y + frameAct.rightRectFoot.height;
+            centerMeasured_L.x = frameAct.leftRectFoot.x + frameAct.leftRectFoot.width / 2;
+            centerMeasured_L.y = frameAct.leftRectFoot.y + frameAct.leftRectFoot.height;
             break;
         case 3 :
-            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
-            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
-            frameAct.leftRectFoot = frameAct.footBoxes[Left];
             frameAct.rightRectFoot = frameAct.footBoxes[Right];
+            frameAct.leftRectFoot = frameAct.footBoxes[Left];
+            centerMeasured_R.x = frameAct.rightRectFoot.x + frameAct.rightRectFoot.width / 2;
+            centerMeasured_R.y = frameAct.rightRectFoot.y + frameAct.rightRectFoot.height;
+            centerMeasured_L.x = frameAct.leftRectFoot.x + frameAct.leftRectFoot.width / 2;
+            centerMeasured_L.y = frameAct.leftRectFoot.y + frameAct.leftRectFoot.height;
             break;
         default :
-            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Left], green, 2);
-            //cv::rectangle(frameAct.processFrame, frameAct.footBoxes[Rigth], green, 2);
-            frameAct.leftRectFoot = frameAct.footBoxes[Left];
             frameAct.rightRectFoot = frameAct.footBoxes[Right];
+            frameAct.leftRectFoot = frameAct.footBoxes[Left];
+            centerMeasured_R.x = frameAct.rightRectFoot.x + frameAct.rightRectFoot.width / 2;
+            centerMeasured_R.y = frameAct.rightRectFoot.y + frameAct.rightRectFoot.height;
+            centerMeasured_L.x = frameAct.leftRectFoot.x + frameAct.leftRectFoot.width / 2;
+            centerMeasured_L.y = frameAct.leftRectFoot.y + frameAct.leftRectFoot.height;
             break;
     }
-
-//    cout << "boxesSize: " << boxesSize << endl;
 
 }
 
@@ -493,11 +412,6 @@ void foot::getFeetBoxes(geoproy GeoProy){
 
     zoneDetectionG3(std::move(GeoProy));
     linearFunctionPosYG3();
-
-    //// dibujando caja menor ////
-    //cv::rectangle(frameAct.processFrame, frameAct.segmLowerBoxFL, cyan, 2);
-    //cv::circle(frameAct.processFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
-
 
     Mat mask = Mat(frameAct.processFrame.size(), CV_8UC1, Scalar(0)); // NOLINT
     rectangle(mask, frameAct.segmLowerBoxFL, Scalar(255), CV_FILLED);
@@ -507,7 +421,7 @@ void foot::getFeetBoxes(geoproy GeoProy){
     //// copia fg a fgROI donde mask es distinto de cero.
     frameAct.segmentedFrame.copyTo(fgROI, mask);
 
-    //// imshow("fgROI", fgROI);
+//    imshow("fgROI", fgROI);
 
     //// aplica componentes conectados otra vez.
     cv::connectedComponents(fgROI, frameAct.labels2Frame, 8, CV_32S);
@@ -515,41 +429,18 @@ void foot::getFeetBoxes(geoproy GeoProy){
     frameAct.footBoxes.clear();
     frameAct.footBoxesVector.clear();
 
+
     getBlobsBoxes(frameAct.labels2Frame, frameAct.footBoxes);
     areasideFilter(frameAct.footBoxes);
 
-    ////
-    ////intentar pegar la pata
-    ////
 
-    orderVectorBoxes(frameAct.footBoxes, frameAct.footBoxesVector);
+    //orderVectorBoxes(frameAct.footBoxes, frameAct.footBoxesVector);
 
     leftrightBoxes();
 
 }
 
-//// Measure Foot ////
-void foot::measureFoot(int pie){
 
-    if(occlusion){
-        if(pie == Right) {
-            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
-            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-        }else{
-            centerMeasured_L.x = frameAct.footBoxes[Right].x + (frameAct.footBoxes[Right].width) / 2;
-            centerMeasured_L.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-        }
-    }else{
-
-        if(pie == Right) {
-            centerMeasured_R.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
-            centerMeasured_R.y = frameAct.footBoxes[Right].y + frameAct.footBoxes[Right].height;
-        }else{
-            centerMeasured_L.x = frameAct.footBoxes[Left].x + frameAct.footBoxes[Left].width / 2;
-            centerMeasured_L.y = frameAct.footBoxes[Left].y + frameAct.footBoxes[Left].height;
-        }
-    }
-}
 
 
 
@@ -771,36 +662,36 @@ void foot::kalmanUpdate(int pie){
 }
 
 
-//// HACER UNA WEA POR ZONA ////
+////// HACER UNA WEA POR ZONA ////
 void foot::stepPrecision(int pie){
 
     int widthThreshold = 20;
 
     if (!occlusion) {
         if (pie == Right) {
-            if (frameAct.footBoxes[Right].width > widthThreshold) {
-                frameAct.rightFoot.x = frameAct.footBoxes[Right].x + (frameAct.footBoxes[Right].width) / 4;
-                frameAct.rightFoot.y = frameAct.footBoxes[Right].y + (frameAct.footBoxes[Right].height *4)/5 ;
+            if (frameAct.rightRectFoot.width > widthThreshold) {
+                frameAct.rightFoot.x = frameAct.rightRectFoot.x + (frameAct.rightRectFoot.width) / 4;
+                frameAct.rightFoot.y = frameAct.rightRectFoot.y + (frameAct.rightRectFoot.height *4)/5 ;
             } else {
-                frameAct.rightFoot.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
-                frameAct.rightFoot.y = frameAct.footBoxes[Right].y + (frameAct.footBoxes[Right].height *4)/5;
+                frameAct.rightFoot.x = frameAct.rightRectFoot.x + frameAct.rightRectFoot.width / 2;
+                frameAct.rightFoot.y = frameAct.rightRectFoot.y + (frameAct.rightRectFoot.height *4)/5;
             }
         } else {
-            if (frameAct.footBoxes[Left].width > widthThreshold) {
-                frameAct.leftFoot.x = frameAct.footBoxes[Left].x + (frameAct.footBoxes[Left].width * 3) / 4;
-                frameAct.leftFoot.y = frameAct.footBoxes[Left].y + (frameAct.footBoxes[Left].height *4)/5;
+            if (frameAct.leftRectFoot.width > widthThreshold) {
+                frameAct.leftFoot.x = frameAct.leftRectFoot.x + (frameAct.leftRectFoot.width * 3) / 4;
+                frameAct.leftFoot.y = frameAct.leftRectFoot.y + (frameAct.leftRectFoot.height *4)/5;
             } else {
-                frameAct.leftFoot.x = frameAct.footBoxes[Left].x + frameAct.footBoxes[Left].width / 2;
-                frameAct.leftFoot.y = frameAct.footBoxes[Left].y + (frameAct.footBoxes[Left].height *4)/5;
+                frameAct.leftFoot.x = frameAct.leftRectFoot.x + frameAct.leftRectFoot.width / 2;
+                frameAct.leftFoot.y = frameAct.leftRectFoot.y + (frameAct.leftRectFoot.height *4)/5;
             }
         }
     }else{
         if(pie == Right) {
-            frameAct.rightFoot.x = frameAct.footBoxes[Right].x + frameAct.footBoxes[Right].width / 2;
-            frameAct.rightFoot.y = frameAct.footBoxes[Right].y + (frameAct.footBoxes[Right].height *4)/5;
+            frameAct.rightFoot.x = frameAct.rightRectFoot.x + frameAct.rightRectFoot.width / 2;
+            frameAct.rightFoot.y = frameAct.rightRectFoot.y + (frameAct.rightRectFoot.height *4)/5;
         }else{
-            frameAct.leftFoot.x = frameAct.footBoxes[Left].x + frameAct.footBoxes[Left].width / 2;
-            frameAct.leftFoot.y = frameAct.footBoxes[Left].y + (frameAct.footBoxes[Left].height *4)/5;
+            frameAct.leftFoot.x = frameAct.leftRectFoot.x + frameAct.leftRectFoot.width / 2;
+            frameAct.leftFoot.y = frameAct.leftRectFoot.y + (frameAct.leftRectFoot.height *4)/5;
         }
     }
 
@@ -987,19 +878,6 @@ void foot::logMatchingErrorTime(){
 
 }
 
-//// Center Special Case Match ////
-void foot::centerSpecialCase(cv::Point stepR, cv::Point stepL){
-
-    bool stepRIn, stepLIn;
-
-    stepRIn = stepR.x > -70 && stepR.x < 70 && stepR.y > -70 && stepR.y < 70;
-    stepLIn = stepL.x > -70 && stepL.x < 70 && stepL.y > -70 && stepL.y < 70;
-
-    centerSpecialFlag = stepRIn && stepLIn;
-
-    //// agregar echo de que puede haber una caja solamente (ocultamiento) y sombra
-
-}
 
 //// Ask which objetive is near of step given ////
 void foot::askObjetives(geoproy GeoProy){
@@ -1012,189 +890,184 @@ void foot::askObjetives(geoproy GeoProy){
 
     //// para cada paso R verifico si el punto esta en algun objetivo
     if (step_R){
-//        stepPointR = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
         stepPointR = geoproy::transformFloor2Image(frameAct.rightFoot, GeoProy.homographyInv);
-
         for (int i = 1; i <= totalObjetives; ++i) {
-            resultDistance = distance(stepPointR, GeoProy.calibPointsFloor[i]);
-            if (resultDistance < objetiveThreshold){
-                objetive = i;
-                foundMatchR = true;
-                break;
-            }else{
-                foundMatchR = false;
+            if (i != 5){
+                resultDistance = distance(stepPointR, GeoProy.calibPointsFloor[i]);
+                if (resultDistance < objetiveThreshold){
+                    objetive = i;
+                    foundMatchR = true;
+                    break;
+                }else{
+                    foundMatchR = false;
+                }
             }
+
         }
     }else{
         foundMatchR = false;
     }
 
-
     if (step_L){
-//        stepPointL = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
         stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
-
         for (int i = 1; i <= totalObjetives; ++i) {
-            resultDistance = distance(stepPointL, GeoProy.calibPointsFloor[i]);
-            if (resultDistance < objetiveThreshold){
-                objetive = i;
-                foundMatchL = true;
-                break;
-            }else{
-                foundMatchL = false;
+            if (i != 5){
+                resultDistance = distance(stepPointL, GeoProy.calibPointsFloor[i]);
+                if (resultDistance < objetiveThreshold){
+                    objetive = i;
+                    foundMatchL = true;
+                    break;
+                }else{
+                    foundMatchL = false;
+                }
             }
+
         }
     }else{
         foundMatchL = false;
     }
 
-    if(step_R || step_L){
-
-//        stepPointR = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
-//        stepPointL = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
-
-
+    if(step_R) {
         stepPointR = geoproy::transformFloor2Image(frameAct.rightFoot, GeoProy.homographyInv);
-        stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
-
-        centerSpecialCase(stepPointR, stepPointL);
-
+        cv::circle(frameAct.processFrame, frameAct.rightFoot, 4, red, -1);
+        centerFlagIsIn = stepPointR.x > -50 && stepPointR.x < 50 && stepPointR.y > -50 && stepPointR.y < 50;
     }
-
-
-    //// considera hacer codigo especial para el caso del centro
-    //// a veces el mono esta al centro con los pies separados no
-    //// necesariamente pegados al punto central
+    if(step_L){
+        stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
+        cv::circle(frameAct.processFrame, frameAct.leftFoot, 4, blue, -1);
+        centerFlagIsIn = stepPointL.x > -50 && stepPointL.x < 50 && stepPointL.y > -50 && stepPointL.y < 50;
+    }
 
 
 }
 
-void foot::centerZoneDetection(geoproy GeoProy){
+void foot::centerOutCountFlag(geoproy GeoProy){
+
+    int countCenterOutTh = 6;
 
     cv::Point2f feetPosFlootR, feetPosFloorL;
-    bool centerFlagR = false;
-    bool centerFlagL = false;
+    bool centerFlagR, centerFlagL;
 
     feetPosFlootR = GeoProy.transformFloor2Image(centerMeasured_R, GeoProy.homographyInv); // NOLINT
     feetPosFloorL = GeoProy.transformFloor2Image(centerMeasured_L, GeoProy.homographyInv); // NOLINT
 
-    //// Grabacion 2
-    /*
     //// logica inversa -> esta afuera = true
-    if (feetPosFlootR.y > -50 && feetPosFlootR.y < 50) {
-        if(feetPosFlootR.x > -50 && feetPosFlootR.x < 50){
-            centerFlagR = false;
-        }
-    }else{
-        centerFlagR = true;
-    }
+    centerFlagR = ((feetPosFlootR.y < -60 || feetPosFlootR.y > 60) ||
+                    (feetPosFlootR.x < -60 || feetPosFlootR.x > 60));
 
-    if (feetPosFloorL.y > -50 && feetPosFloorL.y < 50) {
-        if(feetPosFloorL.x > -50 && feetPosFloorL.x < 50){
-            centerFlagL = false;
-        }
-    }else{
-        centerFlagL = true;
-    }
+    centerFlagL = ((feetPosFloorL.y < -60 || feetPosFloorL.y > 60) ||
+                    (feetPosFloorL.x < -60 || feetPosFloorL.x > 60));
 
     if(centerFlagL && centerFlagR){
         countCenterOut++;
-    }else{
-        countCenterOut = 0;
-    }
-     */
-
-    //// Grabacion 3 ////
-    //// logica inversa -> esta afuera = true
-    centerFlagR = ((feetPosFlootR.y < -50 || feetPosFlootR.y > 50) ||
-                    (feetPosFlootR.x < -50 || feetPosFlootR.x > 50));
-
-    centerFlagL = ((feetPosFloorL.y < -50 || feetPosFloorL.y > 50) ||
-                    (feetPosFloorL.x < -50 || feetPosFloorL.x > 50));
-
-
-    if(centerFlagL && centerFlagR){
-        countCenterOut++;
-        centerSpecialFlag = false;
-    }else{
-        countCenterOut = 0;
     }
 
+    centerFlagWasOut = countCenterOut >= countCenterOutTh;
 }
 
-void foot::matchingCompare(geoproy &GeoProy){
+void foot::stateMachine(geoproy &GeoProy) {
 
-    int countCenterOutTh = 10;
-
-    if (countCenterOut >= countCenterOutTh){
-        centerFlag = false;
-
+    if (init) {
+        center = true;
+        entre = false;
+        objet = false;
+        init = false;
+        betweenFromObjet = true;
+        cout << "Log Center Match Event" << endl;
+        cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
     }
 
-    if (foundMatchR || foundMatchL || centerSpecialFlag) {
+    if (center) {
 
-        if (objetive == 5 || centerSpecialFlag) {
+        cout << "centro reculiao contador ctmre: " << countCenterOut << endl;
 
-            if (!centerFlag) {
+        //// Entrada a Center ////
+        if (centerFlagWasOut){
+            //// Hacer Center ////
+            cout << "Log Center Match Event" << endl;
 
-                if (!objetiveFlag) {
-                    cout << "Log Objetive Error Event: " << endl;
-                    cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
-                    cout << "\n" << endl;
-
-                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount], blue);
-                    paint = true;
-
-                    sequenceCount++;
-                }
-
-                cout << "Log Center Match Event: Foot ";
-                if (foundMatchL && foundMatchR) cout << "Rigth and Left" << endl;
-                else if (foundMatchR) cout << "Rigth" << endl;
-                else cout << "Left" << endl;
-
-                GeoProy.countVisRect = 0;
-
-                centerFlag = true;
-                objetiveFlag = false;
+            if (!betweenFromObjet) {
+                cout << "Log Objetive Error Event: " << endl;
+                cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
+                cout << "\n" << endl;
+                sequenceCount++;
             }
-
-
-
-        } else {
-
-            if (!objetiveFlag) {
-                if (objetive == GeoProy.objetivesG3[sequenceCount]) {
-                    cout << "Log Objetive Match Event: Foot ";
-                    if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
-                    else cout << "Left" << " - Objetivo: " << objetive << endl;
-                    cout << "\n" << endl;
-
-                    GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
-                    paint = true;
-
-                    centerFlag = false;
-                    objetiveFlag = true;
-                    sequenceCount++;
-
-                } else {
-                    cout << "Log Objetive Error Event: Foot " << endl;
-                    if (foundMatchR) cout << "Rigth" << endl;
-                    else cout << "Left" << endl;
-                    cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << objetive << endl;
-                    cout << "\n" << endl;
-
-                    GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount], blue);
-                    paint = true;
-
-                    centerFlag = false;
-                    objetiveFlag = true;
-                    sequenceCount++;
-
-                }
-            }
-
+            cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
         }
+
+
+        //// Salida de Center ////
+        center = false;
+        objet = false;
+        entre = true;
+        betweenFromObjet = false;
+        betweenFromCenter = true;
+        foundMatchL = false;
+        foundMatchR = false;
+        centerFlagIsIn = false;
+        centerFlagWasOut = false;
+        countCenterOut = 0;
+
+    } else if (entre) {
+
+        //// Entrada a Entre ////
+
+
+        //// Hacer de Entre ////
+        askObjetives(GeoProy);
+        centerOutCountFlag(GeoProy);
+
+        //// Salida de Entre ////
+        if ((foundMatchR || foundMatchL) && !betweenFromObjet) {
+            center = false;
+            entre = false;
+            objet = true;
+        } else if (betweenFromObjet && centerFlagIsIn) {
+            center = true;
+            entre = false;
+            objet = false;
+        } else if (betweenFromCenter && centerFlagIsIn){
+            center = true;
+            entre = false;
+            objet = false;
+        }
+
+    } else if (objet) {
+
+        //// Entrada a Objet ////
+
+        //// Hacer de Objet ////
+        if (objetive == GeoProy.objetivesG3[sequenceCount]) {
+            cout << "Log Objetive Match Event: Foot ";
+            if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
+            else cout << "Left" << " - Objetivo: " << objetive << endl;
+            cout << "\n" << endl;
+            GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
+            paint = true;
+            sequenceCount++;
+            centerFlagIsIn = false;
+//            centerFlagWasOut = true;
+        } else {
+            cout << "Log Objetive Error Event: Foot " << endl;
+            if (foundMatchR) cout << "Rigth" << endl;
+            else cout << "Left" << endl;
+            cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << objetive << endl;
+            cout << "\n" << endl;
+            GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount], red);
+            paint = true;
+            sequenceCount++;
+            centerFlagIsIn = false;
+//            centerFlagWasOut = true;
+        }
+
+        //// Salida de Objet ////
+
+        center = false;
+        objet = false;
+        entre = true;
+        betweenFromObjet = true;
+        betweenFromCenter = false;
+
     }
 
     if(paint){
@@ -1203,7 +1076,7 @@ void foot::matchingCompare(geoproy &GeoProy){
                 GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
                 GeoProy.countVisRect += 1;
             } else{
-                GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount - 1], blue);
+                GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount - 1], red);
                 GeoProy.countVisRect += 1;
             }
         }else{
@@ -1213,14 +1086,18 @@ void foot::matchingCompare(geoproy &GeoProy){
     }
 
     if (sequenceCount == 10){
-        cout << "\n RUTINA TERMINADA: " << sequenceCount << endl;
+        stopCount++;
+        if(stopCount == 5){
+            cout << "\n RUTINA TERMINADA " << endl;
+            stop = true;
+        }
     }
 
-
-
-
-
 }
+
+
+
+
 
 
 
@@ -1230,32 +1107,46 @@ void foot::matchingCompare(geoproy &GeoProy){
 //// Draw Results to Image ////
 void foot::drawingResults() {
 
-    cv::circle(frameAct.resultFrame, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
+    //// ARCHIREVISADO ////
+//    cv::rectangle(frameAct.resultFrameR, frameAct.segmLowerBox, cyan, 2);
+//    cv::circle(frameAct.resultFrameR,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
+//    cv::circle(frameAct.resultFrameR, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
+//
+//    cv::rectangle(frameAct.resultFrameR, frameAct.segmLowerBoxFL, cyan, 2);
+//    cv::circle(frameAct.resultFrameR,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
+//
+//    cv::rectangle(frameAct.resultFrameL, frameAct.segmLowerBox, cyan, 2);
+//    cv::circle(frameAct.resultFrameL,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
+//    cv::circle(frameAct.resultFrameL, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
+//
+//    cv::rectangle(frameAct.resultFrameL, frameAct.segmLowerBoxFL, cyan, 2);
+//    cv::circle(frameAct.resultFrameL,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
+
 
     cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBox, cyan, 2);
     cv::circle(frameAct.resultFrame,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
+    cv::circle(frameAct.resultFrame, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
 
     cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBoxFL, cyan, 2);
     cv::circle(frameAct.resultFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
 
-    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
     cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
-
+    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
 
     //// Step Detected or Kalman Filter////
     if (step_R) {
         cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
         cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
     }else{
-        cv::rectangle(frameAct.resultFrame, predRect_R, CV_RGB(255, 0, 0), 2);
-        cv::circle(frameAct.resultFrame, centerKalman_R, 2, CV_RGB(255, 0, 0), -1);
+        cv::rectangle(frameAct.resultFrame, predRect_R, red, 2);
+        cv::circle(frameAct.resultFrame, centerKalman_R, 2, red, -1);
     }
     if (step_L) {
         cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
         cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
     }else{
-        cv::rectangle(frameAct.resultFrame, predRect_L, CV_RGB(255, 0, 0), 2);
-        cv::circle(frameAct.resultFrame, centerKalman_L, 2, CV_RGB(255, 0, 0), -1);
+        cv::rectangle(frameAct.resultFrame, predRect_L, red, 2);
+        cv::circle(frameAct.resultFrame, centerKalman_L, 2, red, -1);
     }
 
 

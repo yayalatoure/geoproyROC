@@ -147,7 +147,7 @@ class foot {
         int Left = 2;
         int rowsIm = 480; int colsIm = 640;
         int platformZone = 2;
-        int objetive;
+        int objetive = 0;
         int stopCount = 0;
         int sequenceCount = 0;
         int countCenterOut = 0;
@@ -186,6 +186,7 @@ class foot {
         bool centerSpecialFlag = true;
         bool objetiveFlag = true;
         bool paint = false;
+        bool paintTarget = false;
 
 
         //// Image & Boxes Atributes ////

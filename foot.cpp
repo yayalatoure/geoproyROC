@@ -975,11 +975,12 @@ void foot::stateMachine(geoproy &GeoProy) {
         betweenFromObjet = true;
         cout << "Log Center Match Event" << endl;
         cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
+        paintTarget = true;
     }
 
     if (center) {
 
-        cout << "centro reculiao contador ctmre: " << countCenterOut << endl;
+//        cout << "centro reculiao contador ctmre: " << countCenterOut << endl;
 
         //// Entrada a Center ////
         if (centerFlagWasOut){
@@ -990,9 +991,13 @@ void foot::stateMachine(geoproy &GeoProy) {
                 cout << "Log Objetive Error Event: " << endl;
                 cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
                 cout << "\n" << endl;
+                paint = true;
                 sequenceCount++;
             }
+
             cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
+            paintTarget = true;
+
         }
 
 
@@ -1071,19 +1076,30 @@ void foot::stateMachine(geoproy &GeoProy) {
     }
 
     if(paint){
-        if (GeoProy.countVisRect <= 6 ){
+        if (GeoProy.countVisRect <= 5){
             if (objetive == GeoProy.objetivesG3[sequenceCount-1]){
                 GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
                 GeoProy.countVisRect += 1;
+                paintTarget = false;
             } else{
                 GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount - 1], red);
                 GeoProy.countVisRect += 1;
+                paintTarget = false;
             }
         }else{
             paint = false;
+            paintTarget = true;
             GeoProy.countVisRect = 0;
         }
     }
+
+
+    if(paintTarget) {
+        GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount], blue);
+    }else{
+        paintTarget = false;
+    }
+
 
     if (sequenceCount == 10){
         stopCount++;

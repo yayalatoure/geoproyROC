@@ -68,7 +68,7 @@ class geoproy {
         int objetivesG2[numPlays];
         int objetivesG3[numPlays];
 
-        int countVisRect;
+        int countVisRect = 0;
 
         //// Points Vector Atributes ////
         std::map<int, cv::Point2f> calibPointsFloor;

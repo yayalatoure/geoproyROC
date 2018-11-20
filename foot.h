@@ -172,7 +172,7 @@ class foot {
         bool totalOccL;
 
         bool init = true;
-        bool center, entre, objet;
+        bool center, object;
         bool betweenFromCenter, betweenFromObjet;
 
 

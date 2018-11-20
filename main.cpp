@@ -26,17 +26,28 @@ using namespace cv;
 int main(int argc, char *argv[]){
 
     cv::Mat img_cal, img_test;
+    cv::Mat to_write(480, 640, CV_8UC3, Scalar(255,255,255));
 
     QGuiApplication a(argc, argv);
 
     //// UPLA Grabacion 3
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada2/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada2/default_calib.yml";
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/default_calib.yml";
 
     //// Player
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada2/Gabriel-2/*.jpg";
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Hector/*.jpg";
     int count_test = 0, count_cal = 0, limit = 10;
-    int seed = 56646810;
+    int seed = 424457088;
+
+    cv::VideoWriter out;
+    string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Video3-Hector.avi";
+    int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');
+    bool isColor = (to_write.type() == CV_8UC3);
+    out.open(videoName, codec, 25, to_write.size(), isColor);
+    if (!out.isOpened()) {
+        cout << "Could not open the output video file for write\n";
+        return 0;
+    }
 
 
     vector<String> filenames_cal, filenames_test;
@@ -144,7 +155,6 @@ int main(int argc, char *argv[]){
                 Foot.stateMachine(geoproyTest);
             }
 
-
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
             Foot.drawingResults();
@@ -186,28 +196,18 @@ int main(int argc, char *argv[]){
         }
 
 
-
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
-
 //            cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
-
             cv::imshow("geoProy", geopro);
 
-
+            out << geopro;
 
             ch = char(cv::waitKey(0));
-
         }
-
         count_cal++;
         count_test++;
-
     }
-
-
-
-
 
     return 0;
 

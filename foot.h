@@ -10,6 +10,8 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <iomanip>
+#include <sstream>
 #include <cstring>
 #include <cmath>
 
@@ -88,13 +90,11 @@ class foot {
         void distanceFilterBoxes();
         void findLowerBox();
         void getLowerBox();
-
         void zoneDetectionG3(geoproy GeoProy);
         void linearFunctionPosYG3();
         void areasideFilter(std::map<int, cv::Rect> &bboxes);
         void getFeetBoxes(geoproy GeoProy);
         void leftrightBoxes();
-
 
         //// Kalman Filter ////
         void kalmanInit(int pie);
@@ -122,14 +122,15 @@ class foot {
 
 
         //// Objetive Matching ////
-        void logMatchingTime();
-        void logMatchingErrorTime();
-
+        void logCSVInit();
+        void logInitFrame();
+        void logMatchingFrame();
+        void logMatchingCenterFrame();
+        void logMatchingError1Frame();
+        void logMatchingError2Frame();
         void askObjetives(geoproy GeoProy);
         void centerOutCountFlag(geoproy GeoProy);
         void stateMachine(geoproy &GeoProy);
-
-
 
         //// Drawing Result ////
         void drawingResults();
@@ -142,6 +143,15 @@ class foot {
 
     public:
 
+        //// CSV Writer Atributes
+        string playerName;
+        string pasadaCali;
+        QString pasadaTest;
+        string fileNameCSV;
+        ofstream ofStream;
+        string frame;
+        int seed, limit;
+
         //// Int Atributes ////
         int Right = 1;
         int Left = 2;
@@ -152,39 +162,25 @@ class foot {
         int sequenceCount = 0;
         int countCenterOut = 0;
 
-
-
-
         //// Bool Atributes ////
         bool start = false;
         bool stop = false;
         bool found;
-
         bool distFilterBoxesFlag = false;
-
         bool Reset_R;
         bool Reset_L;
         bool step_R;
         bool step_L;
-
         bool occlusion;
         bool totalOccR;
         bool totalOccL;
-
         bool init = true;
         bool center, object;
         bool betweenFromCenter, betweenFromObjet;
-
-
-
         bool foundMatchR = false;
         bool foundMatchL = false;
         bool centerFlagWasOut = false;
         bool centerFlagIsIn = true;
-
-
-        bool centerSpecialFlag = true;
-        bool objetiveFlag = true;
         bool paint = false;
         bool paintTarget = false;
 
@@ -196,13 +192,10 @@ class foot {
         unsigned int type = CV_32F;
         int stateSize = 6, measSize  = 4, contSize = 0;
         int notFoundCount = 0;
-
         cv::KalmanFilter kf_R = cv::KalmanFilter(stateSize, measSize, contSize, type);
         cv::KalmanFilter kf_L = cv::KalmanFilter(stateSize, measSize, contSize, type);
-
         cv::Mat state_R = cv::Mat(stateSize, 1, type);
         cv::Mat state_L = cv::Mat(stateSize, 1, type);
-
         cv::Mat meas_R = cv::Mat(measSize, 1, type);
         cv::Mat meas_L = cv::Mat(measSize, 1, type);
 
@@ -232,19 +225,14 @@ class foot {
         cv::Point maxlocSelectedR;
         cv::Point maxlocSelectedL;
 
-
-
-
         //// Colors ////
         static cv::Scalar blue;
         static cv::Scalar green;
         static cv::Scalar red;
-
         static cv::Scalar cyan;
         static cv::Scalar ivory;
         static cv::Scalar blueviolet;
         static cv::Scalar orange;
-
 
 };
 

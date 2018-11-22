@@ -42,23 +42,11 @@
 //    int count_test = 509-30, count_cal = 0, limit = 30;
 //    int seed = 6004;
 
-    //// Player 6
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player6/*.jpg";
-    int teststart = 353;
-    int count_test = teststart-30, count_cal = 0, limit = 30;
-    int seed = 6005;
-
-
-
-
-
 void readCalibFile(QString fileName);
 
 void geoproy::readCalibFile(QString fileName)
 
-
-
-    void foot::distanceFilterBoxes(vector<Rect> &vectorBoxes){
+void foot::distanceFilterBoxes(vector<Rect> &vectorBoxes){
 
     cv::Point boxActPoint, boxAntPointR, boxAntPointL;
     double distanceR, distanceL;
@@ -92,3 +80,23 @@ void geoproy::readCalibFile(QString fileName)
 
 
 }
+
+    //// Player 6
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion2/DATA1/Data1Player6/*.jpg";
+    int teststart = 353;
+    int count_test = teststart-30, count_cal = 0, limit = 30;
+    int seed = 6005;
+
+
+    fileName = "/home/lalo/Dropbox/Proyecto IPD441/NeuroMisil_Lalo/NeuroMisil/Logging/pasos_result.csv";
+    ofstream ofStream(fileName);
+    size_t pos = filenames_test[count_test].find(".jpg");
+    ofStream << "Frame" << "," << "CX_Paso" << "," << "CY_Paso" << "," << "W_Paso" << "." << "H_Paso" << "," << "Pie" << "\n";
+
+    fileout << substring << "," << r.center().x() << "," << r.center().y() << "," <<
+    (*img_out).fboxes[pie].height <<","<<  (*img_out).fboxes[pie].width <<","<<"Rigth"<<"\n";
+
+
+
+
+

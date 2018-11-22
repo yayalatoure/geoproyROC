@@ -865,19 +865,63 @@ void foot::proyectBoxes() {
 
 
 //// OBJETIVE MATCHING ////
+void foot::logCSVInit(){
 
-void foot::logMatchingTime(){
+    fileNameCSV = "/home/lalo/Desktop/GeoProyectiva/Login/"+pasadaTest.toStdString()+ playerName+".csv";
+    ofStream.open(fileNameCSV);
 
+    ofStream << "Name: " << "," << playerName << "\n";
+    ofStream << "Institution: " << "," << "UPLA" << "\n";
+    ofStream << "Age: " << "," << "None" << "\n" << "\n";
 
+    ofStream << "Pasada" << "," << "InitFrame" << "," << "FinalFrame" << "," << "TestType" << "," << "Seed" << ",";
+    ofStream << "#Plays" << "," << "TotalFrames" << "," << "TotalErrors" << ",";
 
+    ofStream <<"P1"<<","<<"E1.1"<<","<<"E2.1"<<","<<"C1"<<",";
+    ofStream <<"P2"<<","<<"E1.2"<<","<<"E2.2"<<","<<"C2"<<",";
+    ofStream <<"P3"<<","<<"E1.3"<<","<<"E2.3"<<","<<"C3"<<",";
+    ofStream <<"P4"<<","<<"E1.4"<<","<<"E2.4"<<","<<"C4"<<",";
+    ofStream <<"P5"<<","<<"E1.5"<<","<<"E2.5"<<","<<"C5"<<",";
+    ofStream <<"P6"<<","<<"E1.6"<<","<<"E2.6"<<","<<"C6"<<",";
+    ofStream <<"P7"<<","<<"E1.7"<<","<<"E2.7"<<","<<"C7"<<",";
+    ofStream <<"P8"<<","<<"E1.8"<<","<<"E2.8"<<","<<"C8"<<",";
+    ofStream <<"P9"<<","<<"E1.9"<<","<<"E2.9"<<","<<"C9"<<",";
+    ofStream <<"P10"<<","<<"E1.10"<<","<<"E2.10"<<","<<"C10"<<"\n";
+
+    ofStream <<pasadaTest.toStdString()<<","<<"Init"<<","<<"Final"<<","<<"Cognitive"<<","<<seed<<","<<"10"<<",";
+    ofStream <<"None"<<","<<"None"<<",";
 }
 
-void foot::logMatchingErrorTime(){
 
-
-
+void foot::logMatchingFrame(){
+    std::string::size_type sz;   // alias of size_t
+    int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
+    string frameToLog = to_string(i_dec);
+    ofStream <<frameToLog<<","<<"None"<<","<<"None"<<",";
 }
 
+void foot::logMatchingCenterFrame(){
+    std::string::size_type sz;   // alias of size_t
+    int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
+    string frameToLog = to_string(i_dec);
+    ofStream <<frameToLog<<",";
+}
+
+void foot::logMatchingError1Frame(){
+    //// Pisa Target Equivocado
+    std::string::size_type sz;   // alias of size_t
+    int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
+    string frameToLog = to_string(i_dec);
+    ofStream <<"None"<<","<<frameToLog<<","<<"None"<<",";
+}
+
+void foot::logMatchingError2Frame(){
+    std::string::size_type sz;   // alias of size_t
+    int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
+    string frameToLog = to_string(i_dec);
+    ofStream <<"None"<<","<<"None"<<","<<frameToLog<<",";
+
+}
 
 //// Ask which objetive is near of step given ////
 void foot::askObjetives(geoproy GeoProy){
@@ -935,8 +979,6 @@ void foot::askObjetives(geoproy GeoProy){
         stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
         centerFlagIsIn = stepPointL.x > -50 && stepPointL.x < 50 && stepPointL.y > -50 && stepPointL.y < 50;
     }
-
-
 }
 
 void foot::centerOutCountFlag(geoproy GeoProy){
@@ -995,14 +1037,20 @@ void foot::stateMachine(geoproy &GeoProy) {
             //// Hacer Center ////
             cout << "Log Center Match Event" << endl;
             if (!betweenFromObjet) {
-                cout << "Log Objetive Error Event: " << endl;
+                logMatchingError2Frame();
+                cout << "Log Objetive Error 2 Event: " << endl;
                 cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
                 cout << "\n" << endl;
                 paint = true;
                 sequenceCount++;
             }
-            cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
-            paintTarget = true;
+
+            logMatchingCenterFrame();
+            if(sequenceCount<=10){
+                cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
+                paintTarget = true;
+            }
+
         }
 
         betweenFromObjet = false;
@@ -1017,6 +1065,7 @@ void foot::stateMachine(geoproy &GeoProy) {
 
         //// Hacer de Objet ////
         if (objetive == GeoProy.objetivesG3[sequenceCount]) {
+            logMatchingFrame();
             cout << "Log Objetive Match Event: Foot ";
             if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
             else cout << "Left" << " - Objetivo: " << objetive << endl;
@@ -1026,7 +1075,8 @@ void foot::stateMachine(geoproy &GeoProy) {
             sequenceCount++;
             centerFlagIsIn = false;
         } else {
-            cout << "Log Objetive Error Event: Foot " << endl;
+            logMatchingError1Frame();
+            cout << "Log Objetive Error 1 Event: Foot " << endl;
             if (foundMatchR) cout << "Rigth" << endl;
             else cout << "Left" << endl;
             cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << objetive << endl;
@@ -1068,19 +1118,13 @@ void foot::stateMachine(geoproy &GeoProy) {
 
     if (sequenceCount == 10){
         stopCount++;
-        if (stopCount == 5) {
+        if (stopCount == 30) {
             cout << "\n RUTINA TERMINADA " << endl;
             stop = true;
         }
     }
 
 }
-
-
-
-
-
-
 
 
 //// DRAW RESULTS ////

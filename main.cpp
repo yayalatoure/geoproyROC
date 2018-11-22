@@ -30,15 +30,26 @@ int main(int argc, char *argv[]){
 
     QGuiApplication a(argc, argv);
 
-    //// UPLA Grabacion 3
-    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/*.jpg";
-    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/Pasada4/default_calib.yml";
+    foot Foot(false);
+    geoproy geoproyTest(true);
 
-    //// Player
-    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/Pasada3/Hector/*.jpg";
+
+    Foot.playerName = "Fabian";
+    Foot.pasadaCali = "Pasada2";
+    Foot.pasadaTest = "Pasada2";
+    Foot.seed = 2025060938;
+    Foot.limit = 0;
+    Foot.logCSVInit();
+
+
+    //// UPLA Grabacion 3 Player Videos
+    string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/"+Foot.pasadaCali+"/*.jpg";
+    QString fileName = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/"+Foot.pasadaTest+"/default_calib.yml";
+    string path_test = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/DATA/"+Foot.pasadaTest.toStdString()+"/"+
+                       Foot.playerName+"/*.jpg";
     int count_test = 0, count_cal = 0, limit = 10;
-    int seed = 424457088;
 
+    /*
     cv::VideoWriter out;
     string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Video3-Hector.avi";
     int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');
@@ -48,7 +59,7 @@ int main(int argc, char *argv[]){
         cout << "Could not open the output video file for write\n";
         return 0;
     }
-
+    */
 
     vector<String> filenames_cal, filenames_test;
 
@@ -61,8 +72,6 @@ int main(int argc, char *argv[]){
 
     char ch = 0;
     int dT = 1;
-    foot Foot(false);
-    geoproy geoproyTest(true);
 
     geoproyTest.readCalibFile(fileName);
     geoproyTest.genCalibPointsSuelo();
@@ -71,7 +80,7 @@ int main(int argc, char *argv[]){
     cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
     cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
 
-    geoproyTest.generateSequence(seed);
+    geoproyTest.generateSequence(Foot.seed);
     geoproyTest.playsToObjetives();
 
     Foot.maskConvexPoly(geoproyTest);
@@ -94,12 +103,10 @@ int main(int argc, char *argv[]){
         ////////// Frame Acquisition /////////
         if (count_cal < limit) {
             img_cal = imread(filenames_cal[count_cal], CV_LOAD_IMAGE_COLOR);
-            img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
-            substring = filenames_test[count_test].substr(pos - digits);
+            substring = filenames_cal[count_cal].substr(pos - digits);
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_cal;
-
-//            cout << substring << endl;
+            //cout << substring << endl;
 
         } else {
             img_test = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
@@ -107,8 +114,9 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
+            //cout << substring << endl;
+            Foot.frame = substring;
 
-//            cout << substring << endl;
 
         }
 
@@ -129,7 +137,6 @@ int main(int argc, char *argv[]){
             Foot.getFeetBoxes(geoproyTest);
 
             Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 1);
-
 
             //// Kalman Filter ////
             Foot.kalmanPredict(Foot.Right, dT);
@@ -164,12 +171,10 @@ int main(int argc, char *argv[]){
             geoproyTest.addCalibPoints(edit);
             geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*) edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
 
-
             //// COUTS ////
             /*
             cout << "Zone?: " << Foot.platformZone << endl;
             cout << "Size: " << Foot.frameAct.footBoxes.size() << endl;
-
             cout << "StepR : " << Foot.step_R << endl;
             cout << "StepL : " << Foot.step_L << endl;
             cout << "CountCenterOut: " << Foot.countCenterOut << endl;
@@ -180,14 +185,10 @@ int main(int argc, char *argv[]){
             cout << "Occlusion?: " << Foot.occlusion << endl;
             cout << "Width R: " << Foot.frameAct.footBoxes[Foot.Right].width << endl;
             cout << "Width L: " << Foot.frameAct.footBoxes[Foot.Left].width << endl;
+            cout << "centerFlagWasOut: " << Foot.centerFlagWasOut << endl;
+            cout << "centerFlagIsIn: " << Foot.centerFlagIsIn << endl;
+            cout << "betweenFromObjet: " << Foot.betweenFromObjet << endl;
             */
-
-//            cout << "centerFlagWasOut: " << Foot.centerFlagWasOut << endl;
-//            cout << "centerFlagIsIn: " << Foot.centerFlagIsIn << endl;
-//            cout << "betweenFromObjet: " << Foot.betweenFromObjet << endl;
-
-
-
 
         } else{
             if(Foot.frameAct.processFrame.data){
@@ -195,18 +196,19 @@ int main(int argc, char *argv[]){
             }
         }
 
-
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
 //            cv::imshow("frameAct", Foot.frameAct.resultFrame);
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
             cv::imshow("geoProy", geopro);
 
-            out << geopro;
+            //out << geopro;
 
             ch = char(cv::waitKey(0));
+
         }
         count_cal++;
         count_test++;
+
     }
 
     return 0;

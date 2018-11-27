@@ -46,8 +46,9 @@ class geoproy {
 
         void generateSequence(int seed);
         void playsToObjetives();
-
         void paintMatchOrError(Mat &image, int objetive, cv::Scalar color);
+
+        void genCirclePoints();
 
 
     public:
@@ -78,6 +79,9 @@ class geoproy {
 
         vector<Point> roiConvexPoly;
 
+
+        std::map<int, cv::Point2f> circlePointsFloor;
+        std::map<int, cv::Point2f> circlePointsImage;
 
 
 

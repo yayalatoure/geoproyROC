@@ -130,6 +130,7 @@ struct byArea {
     }
 };
 
+
 //// Grabacion 3 ////
 void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
 
@@ -302,12 +303,12 @@ void foot::linearFunctionPosYG3(){
 
     //Zone2
     double percentInit2 = 60;
-    double percentFin2 = percentInit1;
+    double percentFin2 = 0.0;
     double yMin2 = -100.0;
     double yMax2 = 50.0;
 
     //Zone3
-    double percentInit3 = 70;
+    double percentInit3 = 60;
     double percentFin3 = percentInit2;
     double yMin3 = -300.0;
     double yMax3 = -100.0;

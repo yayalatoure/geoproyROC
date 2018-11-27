@@ -26,7 +26,7 @@ using namespace cv;
 int main(int argc, char *argv[]){
 
     cv::Mat img_cal, img_test;
-    cv::Mat to_write(480, 640, CV_8UC3, Scalar(255,255,255));
+    cv::Mat to_write(480, 640, CV_8UC3, Scalar(255,255,255)); // NOLINT
 
     QGuiApplication a(argc, argv);
 
@@ -34,10 +34,10 @@ int main(int argc, char *argv[]){
     geoproy geoproyTest(true);
 
 
-    Foot.playerName = "Fabian";
+    Foot.playerName = "Hector";
     Foot.pasadaCali = "Pasada2";
-    Foot.pasadaTest = "Pasada2";
-    Foot.seed = 2025060938;
+    Foot.pasadaTest = "Pasada1";
+    Foot.seed = 868094992;
     Foot.limit = 0;
     Foot.logCSVInit();
 
@@ -77,8 +77,10 @@ int main(int argc, char *argv[]){
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
 
-    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
-    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
+//    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
+//    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
+
+    geoproyTest.genCirclePoints();
 
     geoproyTest.generateSequence(Foot.seed);
     geoproyTest.playsToObjetives();

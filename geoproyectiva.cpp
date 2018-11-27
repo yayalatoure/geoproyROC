@@ -10,6 +10,8 @@
 
 #include <cstdlib>
 
+//#include <math.h>
+#define pi  3.141592653589793238462643383279502884L /* pi */
 
 //// CONSTRUCTOR ////
 
@@ -303,7 +305,30 @@ void geoproy::paintMatchOrError(Mat &image, int objetive, cv::Scalar color){
 
 
 
+void geoproy::genCirclePoints(){
 
+    int objetive = 1;
+    int step = 200;
+    int radio = 20;
+    double cateto = radio*(sqrt(2)/2);
+    cv::Mat &H = homography;
+
+    cv::Point2f p;
+
+    for (int i = 0; i <= 7; ++i) {
+
+        p.x = 200 + static_cast<float>(radio * cos((pi / 4) * i));
+        p.y = 200 + static_cast<float>(radio * sin((pi / 4) * i));
+
+        circlePointsFloor[i] = p;
+        circlePointsImage[i] = transformFloor2Image(p, H);
+
+        cout << circlePointsFloor[i] << endl;
+
+    }
+
+
+}
 
 
 

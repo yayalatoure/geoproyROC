@@ -33,11 +33,10 @@ int main(int argc, char *argv[]){
     foot Foot(false);
     geoproy geoproyTest(true);
 
-
-    Foot.playerName = "Hector";
-    Foot.pasadaCali = "Pasada2";
+    Foot.playerName = "Fabian";
+    Foot.pasadaCali = "Pasada1";
     Foot.pasadaTest = "Pasada1";
-    Foot.seed = 868094992;
+    Foot.seed = 362369073;
     Foot.limit = 0;
     Foot.logCSVInit();
 
@@ -49,17 +48,18 @@ int main(int argc, char *argv[]){
                        Foot.playerName+"/*.jpg";
     int count_test = 0, count_cal = 0, limit = 10;
 
-    /*
+
     cv::VideoWriter out;
-    string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Video3-Hector.avi";
+    string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Result2/"+ Foot.pasadaTest.toStdString()
+                       +"_"+ Foot.playerName+".avi";
     int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');
-    bool isColor = (to_write.type() == CV_8UC3);
+    bool isColor = (to_write.type() == CV_8UC3); // NOLINT
     out.open(videoName, codec, 25, to_write.size(), isColor);
     if (!out.isOpened()) {
         cout << "Could not open the output video file for write\n";
         return 0;
     }
-    */
+
 
     vector<String> filenames_cal, filenames_test;
 
@@ -77,10 +77,8 @@ int main(int argc, char *argv[]){
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
 
-//    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
-//    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
-
-    geoproyTest.genCirclePoints();
+    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
+    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
 
     geoproyTest.generateSequence(Foot.seed);
     geoproyTest.playsToObjetives();
@@ -118,7 +116,6 @@ int main(int argc, char *argv[]){
             Foot.start = true;
             //cout << substring << endl;
             Foot.frame = substring;
-
 
         }
 
@@ -163,15 +160,17 @@ int main(int argc, char *argv[]){
                 //// Matching Objetives State Machine////
                 Foot.stateMachine(geoproyTest);
             }
-
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
             Foot.drawingResults();
 
+
             img = Foot.frameAct.resultFrame.clone();
             edit = QImage((uchar*) img.data, img.cols, img.rows, int(img.step), QImage::Format_RGB888);
             geoproyTest.addCalibPoints(edit);
+            geoproyTest.paintCircles(edit);
             geopro = cv::Mat(edit.height(), edit.width(), CV_8UC3, (uchar*) edit.bits(), static_cast<size_t>(edit.bytesPerLine())); // NOLINT
+
 
             //// COUTS ////
             /*
@@ -203,7 +202,7 @@ int main(int argc, char *argv[]){
             cv::imshow("Segment", Foot.frameAct.segmentedFrame);
             cv::imshow("geoProy", geopro);
 
-            //out << geopro;
+            out << geopro;
 
             ch = char(cv::waitKey(0));
 

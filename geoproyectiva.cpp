@@ -209,7 +209,7 @@ void geoproy::generateSequence(int seedIn){
     bool used[tplays];
     memset(used, false, tplays*sizeof(bool));
 
-    srand(seedIn);
+    srand(static_cast<unsigned int>(seedIn));
 
     for (int i = 0; i < numPlays ; i++) {
         rnd = rand()%(tplays-i); //NOLINT
@@ -305,31 +305,39 @@ void geoproy::paintMatchOrError(Mat &image, int objetive, cv::Scalar color){
 
 
 
-void geoproy::genCirclePoints(){
 
-    int objetive = 1;
-    int step = 200;
-    int radio = 20;
-    double cateto = radio*(sqrt(2)/2);
+void geoproy::genCirclePoints(int objetive){
+
     cv::Mat &H = homography;
-
     cv::Point2f p;
 
-    for (int i = 0; i <= 7; ++i) {
-
-        p.x = 200 + static_cast<float>(radio * cos((pi / 4) * i));
-        p.y = 200 + static_cast<float>(radio * sin((pi / 4) * i));
-
+    for (int i = 0; i < circlenumPoints; ++i) {
+        p.x = calibPointsFloor[objetive].x + static_cast<float>(radio * cos((pi / (circlenumPoints/2.0)) * i));
+        p.y = calibPointsFloor[objetive].y + static_cast<float>(radio * sin((pi / (circlenumPoints/2.0)) * i));
         circlePointsFloor[i] = p;
         circlePointsImage[i] = transformFloor2Image(p, H);
-
-        cout << circlePointsFloor[i] << endl;
-
     }
-
 
 }
 
+void geoproy::paintCircles(QImage &image){
+
+    QPainter pnt;
+    pnt.begin(&image);;
+    cv::Point p1, p2;
+    pnt.setPen(QColor(255,255,0));
+
+    for (int j = 1; j <= 9 ; ++j) {
+        genCirclePoints(j);
+        for (int i = 0; i < circlenumPoints ; ++i) {
+            p1 = circlePointsImage[i];
+            p2 = circlePointsImage[(i+1) % circlenumPoints];
+            pnt.setPen(QColor(255,255,0));
+            pnt.drawLine(QPoint(p1.x, p1.y), QPoint(p2.x, p2.y));
+        }
+    }
+
+}
 
 
 

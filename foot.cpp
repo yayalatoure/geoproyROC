@@ -871,10 +871,6 @@ void foot::logCSVInit(){
     fileNameCSV = "/home/lalo/Desktop/GeoProyectiva/Login/"+pasadaTest.toStdString()+ playerName+".csv";
     ofStream.open(fileNameCSV);
 
-    ofStream << "Name: " << "," << playerName << "\n";
-    ofStream << "Institution: " << "," << "UPLA" << "\n";
-    ofStream << "Age: " << "," << "None" << "\n" << "\n";
-
     ofStream << "Pasada" << "," << "InitFrame" << "," << "FinalFrame" << "," << "TestType" << "," << "Seed" << ",";
     ofStream << "#Plays" << "," << "TotalFrames" << "," << "TotalErrors" << ",";
 
@@ -892,7 +888,6 @@ void foot::logCSVInit(){
     ofStream <<pasadaTest.toStdString()<<","<<"Init"<<","<<"Final"<<","<<"Cognitive"<<","<<seed<<","<<"10"<<",";
     ofStream <<"None"<<","<<"None"<<",";
 }
-
 
 void foot::logMatchingFrame(){
     std::string::size_type sz;   // alias of size_t
@@ -1093,6 +1088,7 @@ void foot::stateMachine(geoproy &GeoProy) {
 
     }
 
+
     if (paint) {
         if (GeoProy.countVisRect <= 5) {
             if (objetive == GeoProy.objetivesG3[sequenceCount-1]) {
@@ -1117,6 +1113,8 @@ void foot::stateMachine(geoproy &GeoProy) {
         paintTarget = false;
     }
 
+
+
     if (sequenceCount == 10){
         stopCount++;
         if (stopCount == 30) {
@@ -1124,6 +1122,7 @@ void foot::stateMachine(geoproy &GeoProy) {
             stop = true;
         }
     }
+
 
 }
 

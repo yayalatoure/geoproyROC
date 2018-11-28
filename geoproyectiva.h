@@ -29,7 +29,6 @@ class geoproy {
         //// Read Calib File ////
         void readCalibFile(QString fileName);
 
-        void readCalibFile();
         //// Generate Scene Calibpoints ////
         void genCalibPointsSuelo();
         void genCalibPointsImage();
@@ -48,7 +47,8 @@ class geoproy {
         void playsToObjetives();
         void paintMatchOrError(Mat &image, int objetive, cv::Scalar color);
 
-        void genCirclePoints();
+        void genCirclePoints(int objetive);
+        void paintCircles(QImage &image);
 
 
     public:
@@ -70,6 +70,9 @@ class geoproy {
         int objetivesG3[numPlays];
 
         int countVisRect = 0;
+
+        int circlenumPoints = 64;
+        int radio = 35;
 
         //// Points Vector Atributes ////
         std::map<int, cv::Point2f> calibPointsFloor;

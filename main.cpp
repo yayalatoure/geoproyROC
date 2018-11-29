@@ -33,14 +33,14 @@ int main(int argc, char *argv[]){
     foot Foot(false);
     geoproy geoproyTest(true);
 
-    Foot.playerName = "Hector";
-    Foot.pasadaCali = "Pasada4";
+    Foot.playerName = "Fabian";
+    Foot.pasadaCali = "Pasada2";
     Foot.pasadaTest = "Pasada2";
     Foot.seed = 291078514;
     Foot.limit = 0;
 
     //// Login
-    Foot.logCSVInit();
+    //Foot.logCSVInit();
 
     //// UPLA Grabacion 3 Player Videos
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/"+Foot.pasadaCali+"/*.jpg";
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
 
 
     cv::VideoWriter out;
-    string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Result2/"+ Foot.pasadaTest.toStdString()
+    string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/"+ Foot.pasadaTest.toStdString()
                        +"_"+ Foot.playerName+"2"+".avi";
     int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');
     bool isColor = (to_write.type() == CV_8UC3); // NOLINT

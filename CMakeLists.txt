@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 file(GLOB SOURCES *.h *.cpp)
 
-set(SOURCE_FILES main.cpp geoproyectiva.cpp geoproyectiva.h foot.cpp foot.h)
+set(SOURCE_FILES main.cpp geoproyectiva.cpp geoproyectiva.h foot.cpp foot.h genroc.cpp genroc.h)
 
 add_executable(GeoProyectiva ${SOURCE_FILES} ${SOURCES})
 

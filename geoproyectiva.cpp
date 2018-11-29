@@ -14,18 +14,16 @@
 #define pi  3.141592653589793238462643383279502884L /* pi */
 
 //// CONSTRUCTOR ////
-
 geoproy::geoproy(bool start) {
     this -> start = true;
 }
 
-void geoproy::readCalibFile(QString fileName) {
+void geoproy::readCalibFile(string fileName) {
 
     if(fileName == "")
         return;
 
-    cv::FileStorage fs(fileName.toStdString(), cv::FileStorage::READ);
-
+    cv::FileStorage fs(fileName, cv::FileStorage::READ);
     FileNode calib = fs["calibration"];
     FileNodeIterator it = calib.begin(), it_end = calib.end();
 
@@ -35,7 +33,6 @@ void geoproy::readCalibFile(QString fileName) {
     }
 
     homographyInv = homography.inv();
-
     fs.release();
 
 }

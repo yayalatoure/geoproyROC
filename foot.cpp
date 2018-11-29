@@ -303,12 +303,12 @@ void foot::linearFunctionPosYG3(){
 
     //Zone2
     double percentInit2 = 60;
-    double percentFin2 = 0.0;
+    double percentFin2 = percentInit1;
     double yMin2 = -100.0;
     double yMax2 = 50.0;
 
     //Zone3
-    double percentInit3 = 60;
+    double percentInit3 = 70;
     double percentFin3 = percentInit2;
     double yMin3 = -300.0;
     double yMax3 = -100.0;
@@ -666,7 +666,7 @@ void foot::kalmanUpdate(int pie){
 ////// HACER UNA WEA POR ZONA ////
 void foot::stepPrecision(int pie){
 
-    int widthThreshold = 20;
+    int widthThreshold = 18;
 
     if (!occlusion) {
         if (pie == Right) {
@@ -868,7 +868,7 @@ void foot::proyectBoxes() {
 //// OBJETIVE MATCHING ////
 void foot::logCSVInit(){
 
-    fileNameCSV = "/home/lalo/Desktop/GeoProyectiva/Login/"+pasadaTest.toStdString()+ playerName+".csv";
+    fileNameCSV = "/home/lalo/Desktop/Login2/"+pasadaTest.toStdString()+ playerName+".csv";
     ofStream.open(fileNameCSV);
 
     ofStream << "Pasada" << "," << "InitFrame" << "," << "FinalFrame" << "," << "TestType" << "," << "Seed" << ",";

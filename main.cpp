@@ -33,13 +33,14 @@ int main(int argc, char *argv[]){
     foot Foot(false);
     geoproy geoproyTest(true);
 
-    Foot.playerName = "Fabian";
-    Foot.pasadaCali = "Pasada1";
-    Foot.pasadaTest = "Pasada1";
-    Foot.seed = 362369073;
+    Foot.playerName = "Hector";
+    Foot.pasadaCali = "Pasada4";
+    Foot.pasadaTest = "Pasada2";
+    Foot.seed = 291078514;
     Foot.limit = 0;
-    Foot.logCSVInit();
 
+    //// Login
+    Foot.logCSVInit();
 
     //// UPLA Grabacion 3 Player Videos
     string path_cal  = "/home/lalo/Desktop/Data_Videos/UPLAGrabacion3/CALIB/"+Foot.pasadaCali+"/*.jpg";
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]){
 
     cv::VideoWriter out;
     string videoName = "/home/lalo/Dropbox/NeuroCoachVideos/Result2/"+ Foot.pasadaTest.toStdString()
-                       +"_"+ Foot.playerName+".avi";
+                       +"_"+ Foot.playerName+"2"+".avi";
     int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');
     bool isColor = (to_write.type() == CV_8UC3); // NOLINT
     out.open(videoName, codec, 25, to_write.size(), isColor);
@@ -62,24 +63,19 @@ int main(int argc, char *argv[]){
 
 
     vector<String> filenames_cal, filenames_test;
-
     glob(path_test, filenames_test);
     glob(path_cal , filenames_cal);
-
     int digits = 5;
     size_t pos = filenames_test[count_test].find(".jpg");
     string substring;
-
     char ch = 0;
     int dT = 1;
 
     geoproyTest.readCalibFile(fileName);
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
-
     cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
     cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
-
     geoproyTest.generateSequence(Foot.seed);
     geoproyTest.playsToObjetives();
 
@@ -93,7 +89,6 @@ int main(int argc, char *argv[]){
     cout << "\n" << endl;
     cout << "Start Algorithm" << endl;
     cout << "\n" << endl;
-
 
     while(ch != 'q' && ch != 'Q') {
 
@@ -114,7 +109,7 @@ int main(int argc, char *argv[]){
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = img_test;
             Foot.start = true;
-            //cout << substring << endl;
+            cout << substring << endl;
             Foot.frame = substring;
 
         }
@@ -153,16 +148,15 @@ int main(int argc, char *argv[]){
             Foot.kalmanResetStep(Foot.Right);
             Foot.kalmanResetStep(Foot.Left);
 
-            //// debug
-            Foot.askObjetives(geoproyTest);
 
+            Foot.askObjetives(geoproyTest);
             if (!Foot.stop){
                 //// Matching Objetives State Machine////
                 Foot.stateMachine(geoproyTest);
             }
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
 
-            Foot.drawingResults();
+            //Foot.drawingResults();
 
 
             img = Foot.frameAct.resultFrame.clone();
@@ -198,14 +192,12 @@ int main(int argc, char *argv[]){
         }
 
         if (Foot.start && (Foot.frameAct.resultFrame.data)) {
-//            cv::imshow("frameAct", Foot.frameAct.resultFrame);
-            cv::imshow("Segment", Foot.frameAct.segmentedFrame);
+            //cv::imshow("frameAct", img_test);
+            //cv::imshow("Segment", Foot.frameAct.segmentedFrame);
             cv::imshow("geoProy", geopro);
 
             out << geopro;
-
             ch = char(cv::waitKey(0));
-
         }
         count_cal++;
         count_test++;

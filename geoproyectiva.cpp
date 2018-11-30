@@ -94,6 +94,7 @@ void geoproy::genCalibPointsCorner() {
     p.x = -step; p.y = step;
     calibPointsCornerFloor[4] = p;
 
+    roiConvexPoly.clear();
     for (int i = 1; i <= 4; ++i) {
         calibPointsCornerImage[i] = transformFloor2Image(calibPointsCornerFloor[i], homography);
         roiConvexPoly.push_back(calibPointsCornerImage[i]);
@@ -325,12 +326,14 @@ void geoproy::paintCircles(QImage &image){
     pnt.setPen(QColor(255,255,0));
 
     for (int j = 1; j <= 9 ; ++j) {
-        genCirclePoints(j);
-        for (int i = 0; i < circlenumPoints ; ++i) {
-            p1 = circlePointsImage[i];
-            p2 = circlePointsImage[(i+1) % circlenumPoints];
-            pnt.setPen(QColor(255,255,0));
-            pnt.drawLine(QPoint(p1.x, p1.y), QPoint(p2.x, p2.y));
+        if(j != 5) {
+            genCirclePoints(j);
+            for (int i = 0; i < circlenumPoints; ++i) {
+                p1 = circlePointsImage[i];
+                p2 = circlePointsImage[(i + 1) % circlenumPoints];
+                pnt.setPen(QColor(255, 255, 0));
+                pnt.drawLine(QPoint(p1.x, p1.y), QPoint(p2.x, p2.y));
+            }
         }
     }
 

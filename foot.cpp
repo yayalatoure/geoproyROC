@@ -72,54 +72,37 @@ void foot::maskConvexPoly(geoproy GeoProy){
 }
 
 //// Segmentation and Foot Boxes ////
-void foot::segmentation(){
+void foot::segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog){
 
     cv::Mat processMasked, foreGround, labels, stats, centroids;
+//    double learningRate = 0.005; ////0.005
 
-
-    //// Grabaciones 1 y 2
-    /*
-    double backgroundRatio = 0.6;
-    double learningRate = 0.005; ////0.005
-    double varThreshold = 250; //// 210
-    int    nmixtures = 3;
-    int    history = 200; ////150
-
-    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
-    mog->setNMixtures(nmixtures);
-    mog->setBackgroundRatio(backgroundRatio);
-    mog->setShadowValue(0);
-    mog->setShadowThreshold(0.3);
-    mog->setDetectShadows(true);
-    */
-
-    //// Grabacion 3
-    double backgroundRatio = 0.6;
-    double learningRate = 0.005; ////0.005
-    double varThreshold = 210; //// 210
-    int    nmixtures = 3;
-    int    history = 200; ////150
-
-    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
-    mog->setNMixtures(nmixtures);
-    mog->setBackgroundRatio(backgroundRatio);
-    mog->setShadowValue(0);
-    mog->setShadowThreshold(0.3);
-    mog->setDetectShadows(true);
-
+//    //// Grabacion 3
+//    double backgroundRatio = 0.6;
+//    double learningRate = 0.005; ////0.005q
+//    int    nmixtures = 3;
+//    int historyMOG = 200;
+//    bool bShadowDetection = true;
+//    static cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(history, varThreshold, true);
+//    mog->setNMixtures(nmixtures);
+//    mog->setBackgroundRatio(backgroundRatio);
+//    mog->setShadowValue(0);
+//    mog->setShadowThreshold(0.3);
+//    mog->setDetectShadows(true);
 
 
     //// Start Segmentation ////
     //// Convex Polygon Mask ////
     frameAct.processFrame.copyTo(processMasked, frameAct.maskConvexPoly);
 
-    mog->apply(processMasked, foreGround, 2*learningRate);
+    mog->apply(processMasked, foreGround, 2*learningrate);
     cv::dilate(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 6))); ////(4,6)
     cv::erode(foreGround, foreGround, cv::getStructuringElement(cv::MORPH_RECT,  cv::Size(3, 3))); ////(4,6)
     cv::connectedComponentsWithStats(foreGround, labels, stats, centroids, 4, CV_32S);
 
     frameAct.segmentedFrame  =  foreGround.clone();
     frameAct.labelsFrame = labels.clone();
+
 
 }
 
@@ -264,6 +247,8 @@ void foot::getLowerBox() {
     findLowerBox();
 
 }
+
+
 
 void foot::zoneDetectionG3(geoproy GeoProy){
 
@@ -440,9 +425,6 @@ void foot::getFeetBoxes(geoproy GeoProy){
     leftrightBoxes();
 
 }
-
-
-
 
 
 //// KALMAN FILTER ////
@@ -662,7 +644,6 @@ void foot::kalmanUpdate(int pie){
 
 }
 
-
 ////// HACER UNA WEA POR ZONA ////
 void foot::stepPrecision(int pie){
 
@@ -700,222 +681,37 @@ void foot::stepPrecision(int pie){
 
 
 
-
-//// TEMPLATE NORMAL DETECTION ////
-
-//// Generate Template ////
-void foot::generateTemplateNp(){
-
-    int xr, yr, wr, hr;
-    int xl, yl, wl, hl;
-
-    if (frameAct.footBoxes[Right].width > 0 && frameAct.footBoxes[Left].width > 0 &&
-            frameAct.footBoxes[Right].height > 0 && frameAct.footBoxes[Left].height > 0 ){
-
-        xr = frameAct.footBoxes[Right].x - offsetR; yr = frameAct.footBoxes[Right].y - offsetR;
-        wr = frameAct.footBoxes[Right].width + 2*offsetR; hr = frameAct.footBoxes[Right].height + 2*offsetR;
-
-        xl = frameAct.footBoxes[Left].x - offsetL; yl = frameAct.footBoxes[Left].y - offsetL;
-        wl = frameAct.footBoxes[Left].width + 2*offsetL; hl = frameAct.footBoxes[Left].height + 2*offsetL;
-
-        if (xr > 0 && xl > 0 && yr > 0 && yl > 0){
-
-            Rect roifootR(xr, yr, wr, hr);
-            Rect roifootL(xl, yl, wl, hl);
-
-            frameAct.tempBoxes[Right] = roifootR;
-            frameAct.tempBoxes[Left]  = roifootL;
-
-            frameAct.templateFrameR = frameAct.processFrame(roifootR);
-            frameAct.tempmaskFrameR = frameAct.segmentedFrame(roifootR);
-
-            frameAct.templateFrameL = frameAct.processFrame(roifootL);
-            frameAct.tempmaskFrameL = frameAct.segmentedFrame(roifootL);
-
-        }
-    }
-
-}
-
-//// OCCLUSION ////
-
-//// Matching Score Partial Occlusion
-//// gets the matching score for Right and Left foot.
-void foot::matchingScorePocc(){
-
-    int offset_oc = 10;
-    int xoc = frameAct.footBoxes[1].x - offset_oc,  yoc = frameAct.footBoxes[1].y - offset_oc;
-    int woc = frameAct.footBoxes[1].width + 2*offset_oc, hoc = frameAct.footBoxes[1].height + 2*offset_oc;
-
-    cv::Rect roioc(xoc, yoc, woc, hoc);
-
-    occlusionCorner.x = xoc;
-    occlusionCorner.y = yoc;
-
-    frameAct.occlusionFrame = frameAct.processFrame(roioc);
-    frameAct.occlumaskFrame = frameAct.segmentedFrame(roioc);
-
-    cv::Mat matchScoreR, matchScoreL, matchScoreShowR, matchScoreShowL;
-
-    matchTemplate(frameAct.occlusionFrame, frameAnt.templateFrameR, matchScoreR, CV_TM_SQDIFF_NORMED);
-    matchTemplate(frameAct.occlusionFrame, frameAnt.templateFrameL, matchScoreL, CV_TM_SQDIFF_NORMED);
-
-    matchScoreR = 1 - matchScoreR;
-    matchScoreL = 1 - matchScoreL;
-    normalize(matchScoreR, matchScoreR, 255, 0, NORM_MINMAX);
-    normalize(matchScoreL, matchScoreL, 255, 0, NORM_MINMAX);
-    matchScoreR.convertTo(matchScoreR, CV_8UC1);     // NOLINT
-    matchScoreL.convertTo(matchScoreL, CV_8UC1);     // NOLINT
-    matchScoreR.convertTo(matchScoreShowR, CV_8UC1); // NOLINT
-    matchScoreL.convertTo(matchScoreShowL, CV_8UC1); // NOLINT
-    applyColorMap(matchScoreShowR, matchScoreShowR, COLORMAP_JET);
-    applyColorMap(matchScoreShowL, matchScoreShowL, COLORMAP_JET);
-
-    frameAct.matchScoreR = matchScoreR;
-    frameAct.matchScoreShowR = matchScoreShowR;
-    frameAct.matchScoreL = matchScoreL;
-    frameAct.matchScoreShowL = matchScoreShowL;
-
-}
-
-//// Found Local Maximum ////
-void foot::occlusionType(){
-
-    cv::Mat segmentationR, segmentationL;
-    cv::Mat erodedR, erodedL;
-    cv::Mat statusR, statusL;
-    cv::Mat componentsR, componentsL;
-
-    //// Segmentation ////
-    threshold(frameAct.matchScoreR, segmentationR, 190, 255, THRESH_BINARY);
-    threshold(frameAct.matchScoreL, segmentationL, 190, 255, THRESH_BINARY);
-    //// Eroded ////
-    erode(segmentationR, erodedR, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
-    erode(segmentationL, erodedL, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
-    //// Connected Component ////
-    connectedComponentsWithStats(erodedR, componentsR, statusR, centroidsR, 4, CV_32S);
-    connectedComponentsWithStats(erodedL, componentsL, statusL, centroidsL, 4, CV_32S);
-
-    totalOccR = centroidsR.rows <= 2;
-    totalOccL = centroidsL.rows <= 2;
-
-}
-
-//// Max Candidates Points Vector ////
-//// Points Corrected for Kalman Compare ////
-void foot::maxCandidatesPocc(){
-
-    cv::Point centro_masa;
-
-    for (int i = 0; i < centroidsR.rows - 1; ++i) {
-        centro_masa.x = int(centroidsR.at<double>(i+1,0));
-        centro_masa.y = int(centroidsR.at<double>(i+1,1));
-        maxLocR.push_back(centro_masa);
-    }
-    for (int i = 0; i < centroidsL.rows - 1; ++i) {
-        centro_masa.x = int(centroidsL.at<double>(i+1,0));
-        centro_masa.y = int(centroidsL.at<double>(i+1,1));
-        maxLocL.push_back(centro_masa);
-    }
-
-}
-
-//// Measure Distance Kalman vs Matching ////
-void foot::matchingSelectPocc(){
-
-    double distR, distL, distMaxR = 1000, distMaxL = 1000;
-    cv::Point bestPointR, bestPointL;
-
-    for (const auto &i : maxLocR) {
-        bestPointR = i;
-        bestPointR.y = bestPointR.y + frameAnt.templateFrameR.rows + occlusionCorner.y;
-        bestPointR.x = bestPointR.x + (frameAnt.templateFrameR.cols/2) + occlusionCorner.x;
-        distR = distance(centerKalman_R, bestPointR);
-        if (distR < distMaxR){
-            distMaxR = distR;
-            maxlocSelectedR = i;
-        }
-    }
-    for (const auto &i : maxLocL) {
-        bestPointL = i;
-        bestPointL.y = bestPointL.y + frameAnt.templateFrameL.rows + occlusionCorner.y;
-        bestPointL.x = bestPointL.x + (frameAnt.templateFrameL.cols/2) + occlusionCorner.x;
-        distL = distance(centerKalman_L, bestPointL);
-        if (distL < distMaxL){
-            distMaxL = distL;
-            maxlocSelectedL = i;
-        }
-    }
-}
-
-//// Update FootBoxes in Partial Occlusion ////
-//// considera proyectar tomando en cuenta el punto mas bajo en template mask ////
-void foot::proyectBoxes() {
-
-    frameAct.footBoxes[Right]   = predRect_R;
-    frameAct.footBoxes[Right].x = maxlocSelectedR.x + occlusionCorner.x - offsetR/2;
-    frameAct.footBoxes[Right].y = maxlocSelectedR.y + occlusionCorner.y - offsetR/2;
-
-    frameAct.footBoxes[Left]   = predRect_L;
-    frameAct.footBoxes[Left].x = maxlocSelectedL.x + occlusionCorner.x - offsetL/2;
-    frameAct.footBoxes[Left].y = maxlocSelectedL.y + occlusionCorner.y - offsetL/2;
-
-}
-
-
-
-
-//// OBJETIVE MATCHING ////
-void foot::logCSVInit(){
-
-    fileNameCSV = "/home/lalo/Desktop/Login2/"+pasadaTest.toStdString()+ playerName+".csv";
-    ofStream.open(fileNameCSV);
-
-    ofStream << "Pasada" << "," << "InitFrame" << "," << "FinalFrame" << "," << "TestType" << "," << "Seed" << ",";
-    ofStream << "#Plays" << "," << "TotalFrames" << "," << "TotalErrors" << ",";
-
-    ofStream <<"P1"<<","<<"E1.1"<<","<<"E2.1"<<","<<"C1"<<",";
-    ofStream <<"P2"<<","<<"E1.2"<<","<<"E2.2"<<","<<"C2"<<",";
-    ofStream <<"P3"<<","<<"E1.3"<<","<<"E2.3"<<","<<"C3"<<",";
-    ofStream <<"P4"<<","<<"E1.4"<<","<<"E2.4"<<","<<"C4"<<",";
-    ofStream <<"P5"<<","<<"E1.5"<<","<<"E2.5"<<","<<"C5"<<",";
-    ofStream <<"P6"<<","<<"E1.6"<<","<<"E2.6"<<","<<"C6"<<",";
-    ofStream <<"P7"<<","<<"E1.7"<<","<<"E2.7"<<","<<"C7"<<",";
-    ofStream <<"P8"<<","<<"E1.8"<<","<<"E2.8"<<","<<"C8"<<",";
-    ofStream <<"P9"<<","<<"E1.9"<<","<<"E2.9"<<","<<"C9"<<",";
-    ofStream <<"P10"<<","<<"E1.10"<<","<<"E2.10"<<","<<"C10"<<"\n";
-
-    ofStream <<pasadaTest.toStdString()<<","<<"Init"<<","<<"Final"<<","<<"Cognitive"<<","<<seed<<","<<"10"<<",";
-    ofStream <<"None"<<","<<"None"<<",";
-}
-
 void foot::logMatchingFrame(){
+    ofstream &fileout = *ofStream;
     std::string::size_type sz;   // alias of size_t
     int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
     string frameToLog = to_string(i_dec);
-    ofStream <<frameToLog<<","<<"None"<<","<<"None"<<",";
+    fileout <<frameToLog<<","<<"None"<<","<<"None"<<",";
 }
 
 void foot::logMatchingCenterFrame(){
+    ofstream &fileout = *ofStream;
     std::string::size_type sz;   // alias of size_t
     int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
     string frameToLog = to_string(i_dec);
-    ofStream <<frameToLog<<",";
+    fileout <<frameToLog<<",";
 }
 
 void foot::logMatchingError1Frame(){
     //// Pisa Target Equivocado
+    ofstream &fileout = *ofStream;
     std::string::size_type sz;   // alias of size_t
     int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
     string frameToLog = to_string(i_dec);
-    ofStream <<"None"<<","<<frameToLog<<","<<"None"<<",";
+    fileout <<"None"<<","<<frameToLog<<","<<"None"<<",";
 }
 
 void foot::logMatchingError2Frame(){
+    ofstream &fileout = *ofStream;
     std::string::size_type sz;   // alias of size_t
     int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
     string frameToLog = to_string(i_dec);
-    ofStream <<"None"<<","<<"None"<<","<<frameToLog<<",";
+    fileout <<"None"<<","<<"None"<<","<<frameToLog<<",";
 
 }
 
@@ -1117,7 +913,7 @@ void foot::stateMachine(geoproy &GeoProy) {
 
     if (sequenceCount == 10){
         stopCount++;
-        if (stopCount == 30) {
+        if (stopCount == 20) {
             cout << "\n RUTINA TERMINADA " << endl;
             stop = true;
         }
@@ -1149,32 +945,34 @@ void foot::drawingResults() {
     cv::circle(frameAct.resultFrameL,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
     */
 
-//    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBox, cyan, 2);
-//    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
-//    cv::circle(frameAct.resultFrame, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
-//
-//    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBoxFL, cyan, 2);
-//    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
+    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBox, cyan, 2);
+    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBox.br()+frameAct.segmLowerBox.tl())/2, 3, cyan, -1);
+    cv::circle(frameAct.resultFrame, (frameAnt.segmLowerBox.br()+frameAnt.segmLowerBox.tl())/2, 3, blue, -1);
 
-    cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
-    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
+    cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBoxFL, cyan, 2);
+    cv::circle(frameAct.resultFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
 
-    //// Step Detected or Kalman Filter////
-    if (step_R) {
-        cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
-        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
-    }
+//    cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
+//    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
+
+//    //// Step Detected or Kalman Filter////
+//    if (step_R) {
+//        cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
+//        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
+//    }
+//    if (step_L) {
+//        cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
+//        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
+//    }
+
+
+
 
 //    else{
 //        cv::rectangle(frameAct.resultFrame, predRect_R, red, 2);
 //        cv::circle(frameAct.resultFrame, centerKalman_R, 2, red, -1);
 //    }
-
-    if (step_L) {
-        cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
-        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
-    }
-
+//
 //    else{
 //        cv::rectangle(frameAct.resultFrame, predRect_L, red, 2);
 //        cv::circle(frameAct.resultFrame, centerKalman_L, 2, red, -1);
@@ -1267,7 +1065,6 @@ void foot::drawingResults() {
 //// Clear Variables ////
 void foot::clearVariables(){
 
-    maxLocR.clear();
-    maxLocL.clear();
+
 
 }

@@ -34,8 +34,17 @@ int main(int argc, char *argv[]){
     genroc genROC(true);
 
 
-    genROC.getVideo(1);
-    genROC.algorithm();
+    genROC.varThreshold = 210;
+    genROC.logcsvOpen();
+    for (int i = 1; i <= 9 ; ++i) {
+        genROC.numVideo = i;
+        genROC.getVideo();
+        genROC.firstLog();
+        genROC.algorithm();
+
+    }
+    genROC.logcsvClose();
+
 
     return 0;
 

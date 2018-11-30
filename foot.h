@@ -37,16 +37,6 @@ typedef struct {
     cv::Mat maskConvexPoly;
     cv::Mat segmentedFrame;
     cv::Mat resultFrame;
-    cv::Mat templateFrameR;
-    cv::Mat tempmaskFrameR;
-    cv::Mat templateFrameL;
-    cv::Mat tempmaskFrameL;
-    cv::Mat occlusionFrame;
-    cv::Mat occlumaskFrame;
-    cv::Mat matchScoreR;
-    cv::Mat matchScoreL;
-    cv::Mat matchScoreShowR;
-    cv::Mat matchScoreShowL;
 
     //// Segmentation Labels ////
     cv::Mat labelsFrame;
@@ -84,7 +74,7 @@ class foot {
 
         //// Segmentation & ROI (footBoxes) ////
         void maskConvexPoly(geoproy GeoProy);
-        void segmentation();
+        void segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog);
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
         void orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
         void distanceFilterBoxes();
@@ -143,12 +133,13 @@ class foot {
 
     public:
 
+        //// Reset MOG2 ////
+        bool videoChange = false;
+        double learningrate;
+
         //// CSV Writer Atributes
-        string playerName;
-        string pasadaCali;
-        QString pasadaTest;
-        string fileNameCSV;
-        ofstream ofStream;
+        ofstream *ofStream;
+
         string frame;
         int seed, limit;
 
@@ -233,6 +224,9 @@ class foot {
         static cv::Scalar ivory;
         static cv::Scalar blueviolet;
         static cv::Scalar orange;
+
+
+
 
 };
 

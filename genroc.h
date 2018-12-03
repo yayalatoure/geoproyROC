@@ -25,11 +25,7 @@ public:
     void getVideo();
     void firstLog();
     void logcsvClose();
-
     void algorithm();
-
-
-
 
 
 public:
@@ -44,6 +40,8 @@ public:
 
     //// Video Get Atributes ////
 
+    bool stopLoopFlag = false;
+
     int dT = 1;
     int seed;
     int limit = 10;
@@ -52,7 +50,9 @@ public:
     int count_test = 0;
     int numVideo = 0;
     int numCalibVideo = 0;
+
     char ch = 0;
+
     size_t pos;
     string pathVideos;
     string pathCalib;

@@ -118,6 +118,7 @@ class foot {
         void logMatchingCenterFrame();
         void logMatchingError1Frame();
         void logMatchingError2Frame();
+        void logEndVideo();
         void askObjetives(geoproy GeoProy);
         void centerOutCountFlag(geoproy GeoProy);
         void stateMachine(geoproy &GeoProy);
@@ -134,14 +135,13 @@ class foot {
     public:
 
         //// Reset MOG2 ////
-        bool videoChange = false;
         double learningrate;
 
         //// CSV Writer Atributes
         ofstream *ofStream;
 
         string frame;
-        int seed, limit;
+        int limit;
 
         //// Int Atributes ////
         int Right = 1;

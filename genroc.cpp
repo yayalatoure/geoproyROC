@@ -28,7 +28,7 @@ void genroc::logcsvOpen(){
     ofStreamGenroc <<"P7"<<","<<"E1.7"<<","<<"E2.7"<<","<<"C7"<<",";
     ofStreamGenroc <<"P8"<<","<<"E1.8"<<","<<"E2.8"<<","<<"C8"<<",";
     ofStreamGenroc <<"P9"<<","<<"E1.9"<<","<<"E2.9"<<","<<"C9"<<",";
-    ofStreamGenroc <<"P10"<<","<<"E1.10"<<","<<"E2.10"<<","<<"C10"<<"\n";
+    ofStreamGenroc <<"P10"<<","<<"E1.10"<<","<<"E2.10"<<","<<"C10" << "\n";
 
 }
 
@@ -106,7 +106,7 @@ void genroc::getVideo() {
 void genroc::firstLog(){
 
     ofStreamGenroc <<to_string(numVideo)<<","<<"Init"<<","<<"Final"<<","<<"Cognitive"<<","<<seed<<","<<"10"<<",";
-    ofStreamGenroc <<to_string(varThreshold)<<","<<"None"<<"\n";
+    ofStreamGenroc <<to_string(varThreshold)<<","<<"None"<<",";
 
 }
 
@@ -117,12 +117,12 @@ void genroc::logcsvClose(){
 void genroc::algorithm(){
 
     Mat img_cal, img_test;
-    bool start = false;
 
     foot Foot(false);
     geoproy geoproyTest(true);
 
-    cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(historyMOG, varThreshold, bShadowDetection);
+    cv::Ptr<cv::BackgroundSubtractorMOG2> mog = cv::createBackgroundSubtractorMOG2(historyMOG, varThreshold,
+                                                bShadowDetection);
     mog->setNMixtures(nmixtures);
     mog->setBackgroundRatio(backgroundRatio);
     mog->setShadowValue(0);
@@ -139,11 +139,15 @@ void genroc::algorithm(){
     geoproyTest.playsToObjetives();
 
     Foot.maskConvexPoly(geoproyTest);
+    Foot.limit = 0;
+    Foot.ofStream = &ofStreamGenroc;
 
     QImage edit;
     cv::Mat geopro, img;
 
-    while(ch != 'q' && ch != 'Q') {
+    stopLoopFlag = false;
+
+    while(ch != 'q' && ch != 'Q' && !stopLoopFlag) {
         //// Transfer Frame Structure ////
         Foot.frameAnt = Foot.frameAct;
 
@@ -152,19 +156,58 @@ void genroc::algorithm(){
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = imread(filenames_cal[count_cal], CV_LOAD_IMAGE_COLOR);
             substring = filenames_cal[count_cal].substr(pos - digits);
-            cout << substring << endl;
+            //cout << substring << endl;
         } else {
+            Foot.start = true;
             Foot.frameAct.processFrame.release();
             Foot.frameAct.processFrame = imread(filenames_test[count_test], CV_LOAD_IMAGE_COLOR);
+            if (!Foot.frameAct.processFrame.data){
+                stopLoopFlag = true;
+                break;
+            }
             substring = filenames_test[count_test].substr(pos - digits);
-            start = true;
-            cout << substring << endl;
+            Foot.frame = substring;
+            //cout << substring << endl;
         }
 
-        if (Foot.frameAct.processFrame.data && start) {
+        if (Foot.frameAct.processFrame.data && Foot.start) {
+
+            //// Low Step Flag ////
+            Foot.step_R = false;
+            Foot.step_L = false;
+
+            //// Clone process frame to result frame ////
+            Foot.frameAct.resultFrame = Foot.frameAct.processFrame.clone();
 
             Foot.segmentation(mog);
             Foot.getLowerBox();
+
+            Foot.getFeetBoxes(geoproyTest);
+
+            Foot.occlusion = bool(Foot.frameAct.footBoxes.size() <= 1);
+
+            //// Kalman Filter ////
+            Foot.kalmanPredict(Foot.Right, dT);
+            Foot.kalmanPredict(Foot.Left, dT);
+
+            //// Kalman Update ////
+            Foot.kalmanUpdate(Foot.Right);
+            Foot.kalmanUpdate(Foot.Left);
+
+            //// Measure Error ////
+            Foot.measureError1Np(Foot.Right);
+            Foot.measureError1Np(Foot.Left);
+
+            //// Kalman Reset Step ////
+            Foot.kalmanResetStep(Foot.Right);
+            Foot.kalmanResetStep(Foot.Left);
+
+            Foot.askObjetives(geoproyTest);
+
+            if (!Foot.stop){
+                //// Matching Objetives State Machine////
+                Foot.stateMachine(geoproyTest);
+            }
 
             Foot.frameAct.processFrame.copyTo(Foot.frameAct.resultFrame);
             Foot.drawingResults();
@@ -181,12 +224,11 @@ void genroc::algorithm(){
             }
         }
 
-
         //// SHOW IMAGES ////
-        if (Foot.frameAct.processFrame.data && start) {
-            imshow("Segment", Foot.frameAct.segmentedFrame);
-            imshow("Result", Foot.frameAct.resultFrame);
+        if (Foot.frameAct.processFrame.data && Foot.start) {
             imshow("geoProy", geopro);
+            imshow("Segment", Foot.frameAct.segmentedFrame);
+            //imshow("Result", Foot.frameAct.processFrame);
             ch = char(cv::waitKey(0));
         }else if(Foot.frameAct.processFrame.data){
             imshow("Segment", Foot.frameAct.segmentedFrame);

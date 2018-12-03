@@ -75,8 +75,8 @@ void foot::maskConvexPoly(geoproy GeoProy){
 void foot::segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog){
 
     cv::Mat processMasked, foreGround, labels, stats, centroids;
-//    double learningRate = 0.005; ////0.005
 
+/*
 //    //// Grabacion 3
 //    double backgroundRatio = 0.6;
 //    double learningRate = 0.005; ////0.005q
@@ -89,7 +89,7 @@ void foot::segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog){
 //    mog->setShadowValue(0);
 //    mog->setShadowThreshold(0.3);
 //    mog->setDetectShadows(true);
-
+*/
 
     //// Start Segmentation ////
     //// Convex Polygon Mask ////
@@ -102,7 +102,6 @@ void foot::segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog){
 
     frameAct.segmentedFrame  =  foreGround.clone();
     frameAct.labelsFrame = labels.clone();
-
 
 }
 
@@ -684,7 +683,7 @@ void foot::stepPrecision(int pie){
 void foot::logMatchingFrame(){
     ofstream &fileout = *ofStream;
     std::string::size_type sz;   // alias of size_t
-    int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
+    int i_dec = std::stoi (frame.substr(0,5), &sz) - limit;
     string frameToLog = to_string(i_dec);
     fileout <<frameToLog<<","<<"None"<<","<<"None"<<",";
 }
@@ -711,9 +710,15 @@ void foot::logMatchingError2Frame(){
     std::string::size_type sz;   // alias of size_t
     int i_dec = std::stoi (frame.substr(0,5),&sz) - limit;
     string frameToLog = to_string(i_dec);
-    fileout <<"None"<<","<<"None"<<","<<frameToLog<<",";
+    fileout <<"None"<<","<<"None"<<","<<"yes"<<",";
 
 }
+
+void foot::logEndVideo(){
+    ofstream &fileout = *ofStream;
+    fileout <<"\n";
+}
+
 
 //// Ask which objetive is near of step given ////
 void foot::askObjetives(geoproy GeoProy){
@@ -765,11 +770,11 @@ void foot::askObjetives(geoproy GeoProy){
 
     if(step_R) {
         stepPointR = geoproy::transformFloor2Image(frameAct.rightFoot, GeoProy.homographyInv);
-        centerFlagIsIn = stepPointR.x > -50 && stepPointR.x < 50 && stepPointR.y > -50 && stepPointR.y < 50;
+        centerFlagIsIn = stepPointR.x > -60 && stepPointR.x < 60 && stepPointR.y > -60 && stepPointR.y < 60;
     }
     if(step_L){
         stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
-        centerFlagIsIn = stepPointL.x > -50 && stepPointL.x < 50 && stepPointL.y > -50 && stepPointL.y < 50;
+        centerFlagIsIn = stepPointL.x > -60 && stepPointL.x < 60 && stepPointL.y > -60 && stepPointL.y < 60;
     }
 }
 
@@ -804,8 +809,8 @@ void foot::stateMachine(geoproy &GeoProy) {
         object = false;
         init = false;
         betweenFromObjet = true;
-        cout << "Log Center Match Event Inicial" << endl;
-        cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
+//        cout << "Log Center Match Event Inicial" << endl;
+//        cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
         paintTarget = true;
     }
 
@@ -827,19 +832,19 @@ void foot::stateMachine(geoproy &GeoProy) {
         //// Entrada a Center ////
         if (centerFlagWasOut){
             //// Hacer Center ////
-            cout << "Log Center Match Event" << endl;
+            //cout << "Log Center Match Event" << endl;
             if (!betweenFromObjet) {
                 logMatchingError2Frame();
-                cout << "Log Objetive Error 2 Event: " << endl;
-                cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
-                cout << "\n" << endl;
+//                cout << "Log Objetive Error 2 Event: " << endl;
+//                cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << "None" << endl;
+//                cout << "\n" << endl;
                 paint = true;
                 sequenceCount++;
             }
 
             logMatchingCenterFrame();
             if(sequenceCount<=10){
-                cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
+//                cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
                 paintTarget = true;
             }
 
@@ -858,21 +863,21 @@ void foot::stateMachine(geoproy &GeoProy) {
         //// Hacer de Objet ////
         if (objetive == GeoProy.objetivesG3[sequenceCount]) {
             logMatchingFrame();
-            cout << "Log Objetive Match Event: Foot ";
-            if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
-            else cout << "Left" << " - Objetivo: " << objetive << endl;
-            cout << "\n" << endl;
+//            cout << "Log Objetive Match Event: Foot ";
+//            if (foundMatchR) cout << "Rigth" << " - Objetivo: " << objetive << endl;
+//            else cout << "Left" << " - Objetivo: " << objetive << endl;
+//            cout << "\n" << endl;
             GeoProy.paintMatchOrError(frameAct.processFrame, objetive, green);
             paint = true;
             sequenceCount++;
             centerFlagIsIn = false;
         } else {
             logMatchingError1Frame();
-            cout << "Log Objetive Error 1 Event: Foot " << endl;
-            if (foundMatchR) cout << "Rigth" << endl;
-            else cout << "Left" << endl;
-            cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << objetive << endl;
-            cout << "\n" << endl;
+//            cout << "Log Objetive Error 1 Event: Foot " << endl;
+//            if (foundMatchR) cout << "Rigth" << endl;
+//            else cout << "Left" << endl;
+//            cout << "Objetivo: " << GeoProy.objetivesG3[sequenceCount] << " - Alcanzado: " << objetive << endl;
+//            cout << "\n" << endl;
             GeoProy.paintMatchOrError(frameAct.processFrame, GeoProy.objetivesG3[sequenceCount], red);
             paint = true;
             sequenceCount++;
@@ -915,6 +920,7 @@ void foot::stateMachine(geoproy &GeoProy) {
         stopCount++;
         if (stopCount == 20) {
             cout << "\n RUTINA TERMINADA " << endl;
+            logEndVideo();
             stop = true;
         }
     }
@@ -952,31 +958,31 @@ void foot::drawingResults() {
     cv::rectangle(frameAct.resultFrame, frameAct.segmLowerBoxFL, cyan, 2);
     cv::circle(frameAct.resultFrame,(frameAct.segmLowerBoxFL.br()+frameAct.segmLowerBoxFL.tl())/2, 3, cyan, -1);
 
-//    cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
-//    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
+    cv::rectangle(frameAct.resultFrame, frameAct.rightRectFoot, green, 2);
+    cv::rectangle(frameAct.resultFrame, frameAct.leftRectFoot, green, 2);
 
-//    //// Step Detected or Kalman Filter////
-//    if (step_R) {
-//        cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
-//        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
-//    }
-//    if (step_L) {
-//        cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
-//        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
-//    }
+    //// Step Detected or Kalman Filter////
+    if (step_R) {
+        cv::rectangle(frameAct.resultFrame, predRect_R, blue, 2);
+        cv::circle(frameAct.resultFrame, frameAct.rightFoot, 2, blue, -1);
+    }
+    else{
+        cv::rectangle(frameAct.resultFrame, predRect_R, red, 2);
+        cv::circle(frameAct.resultFrame, centerKalman_R, 2, red, -1);
+    }
+
+    if (step_L) {
+        cv::rectangle(frameAct.resultFrame, predRect_L, blue, 2);
+        cv::circle(frameAct.resultFrame, frameAct.leftFoot, 2, blue, -1);
+    }
+    else{
+        cv::rectangle(frameAct.resultFrame, predRect_L, red, 2);
+        cv::circle(frameAct.resultFrame, centerKalman_L, 2, red, -1);
+    }
 
 
 
 
-//    else{
-//        cv::rectangle(frameAct.resultFrame, predRect_R, red, 2);
-//        cv::circle(frameAct.resultFrame, centerKalman_R, 2, red, -1);
-//    }
-//
-//    else{
-//        cv::rectangle(frameAct.resultFrame, predRect_L, red, 2);
-//        cv::circle(frameAct.resultFrame, centerKalman_L, 2, red, -1);
-//    }
 
 
     /*

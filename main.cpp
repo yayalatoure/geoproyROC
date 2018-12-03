@@ -32,8 +32,10 @@ int main(int argc, char *argv[]){
     QGuiApplication a(argc, argv);
     genroc genROC(true);
 
-//    for (int j = 0; j < 10; ++j) {
-        genROC.varThreshold = 180;  // 150 + j*10;
+    for (int j = 0; j < 10; ++j) {
+        genROC.varThreshold = 150 + j*10;
+        cout << "\n" << "VarThreshold: " << endl;
+        cout << genROC.varThreshold << endl;
         genROC.logcsvOpen();
         for (int i = 1; i <= 9 ; ++i) {
             genROC.numVideo = i;
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]){
             genROC.algorithm();
         }
         genROC.logcsvClose();
-//    }
+    }
 
 
 

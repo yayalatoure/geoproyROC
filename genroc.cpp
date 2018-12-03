@@ -89,12 +89,12 @@ void genroc::getVideo() {
     path_cal  = pathCalib + to_string(numCalibVideo)+"/*.jpg";
     calfileName = pathCalib + to_string(numCalibVideo) + "/default_calib.yml";
 
-    cout << "\n" << "Path de Video" << endl;
+    cout << "\n" << "Path Video: " << endl;
     cout << path_test << endl;
-    cout << "Path de Video Calibracion" << endl;
-    cout << path_cal << endl;
-    cout << "Path de Archivo Calibracion" << endl;
-    cout << calfileName << endl;
+//    cout << "Path Video Calibracion" << endl;
+//    cout << path_cal << endl;
+//    cout << "Path Archivo Calibracion" << endl;
+//    cout << calfileName << endl;
 
     glob(path_test, filenames_test);
     glob(path_cal , filenames_cal);
@@ -117,7 +117,6 @@ void genroc::logcsvClose(){
 void genroc::algorithm(){
 
     Mat img_cal, img_test;
-
     foot Foot(false);
     geoproy geoproyTest(true);
 
@@ -133,8 +132,6 @@ void genroc::algorithm(){
     geoproyTest.readCalibFile(calfileName);
     geoproyTest.genCalibPointsSuelo();
     geoproyTest.genCalibPointsCorner();
-    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
-    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
     geoproyTest.generateSequence(seed);
     geoproyTest.playsToObjetives();
 
@@ -147,7 +144,9 @@ void genroc::algorithm(){
 
     stopLoopFlag = false;
 
-    while(ch != 'q' && ch != 'Q' && !stopLoopFlag) {
+    while(!stopLoopFlag){   //(ch != 'q' && ch != 'Q' && !stopLoopFlag) {  //
+
+
         //// Transfer Frame Structure ////
         Foot.frameAnt = Foot.frameAct;
 
@@ -180,6 +179,12 @@ void genroc::algorithm(){
             Foot.frameAct.resultFrame = Foot.frameAct.processFrame.clone();
 
             Foot.segmentation(mog);
+
+            if (Foot.firstTimeLBFlag){
+                Foot.firstTimeLowerBox(geoproyTest);
+                Foot.firstTimeLBFlag = false;
+            }
+
             Foot.getLowerBox();
 
             Foot.getFeetBoxes(geoproyTest);
@@ -224,25 +229,22 @@ void genroc::algorithm(){
             }
         }
 
-        //// SHOW IMAGES ////
-        if (Foot.frameAct.processFrame.data && Foot.start) {
-            imshow("geoProy", geopro);
-            imshow("Segment", Foot.frameAct.segmentedFrame);
-            //imshow("Result", Foot.frameAct.processFrame);
-            ch = char(cv::waitKey(0));
-        }else if(Foot.frameAct.processFrame.data){
-            imshow("Segment", Foot.frameAct.segmentedFrame);
-            ch = char(cv::waitKey(0));
-        }
+//        //// SHOW IMAGES ////
+//        if (Foot.frameAct.processFrame.data && Foot.start) {
+//            imshow("geoProy", geopro);
+//            imshow("Segment", Foot.frameAct.segmentedFrame);
+//            //imshow("Result", Foot.frameAct.processFrame);
+//            ch = char(cv::waitKey(0));
+//        }
+//
+//        else if(Foot.frameAct.processFrame.data){
+//            imshow("Segment", Foot.frameAct.segmentedFrame);
+//            ch = char(cv::waitKey(0));
+//        }
 
         count_cal++;
         count_test++;
-
     }
-
     ch = 0;
-
-
-
 
 }

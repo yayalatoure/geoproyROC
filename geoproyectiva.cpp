@@ -35,6 +35,9 @@ void geoproy::readCalibFile(string fileName) {
     homographyInv = homography.inv();
     fs.release();
 
+//    cout << "Homography: \n" << geoproyTest.homography << "\n" << endl;
+//    cout << "Homography Inv: \n" << geoproyTest.homographyInv << "\n" << endl;
+
 }
 
 void geoproy::genCalibPointsSuelo() {

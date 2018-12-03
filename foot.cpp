@@ -112,6 +112,20 @@ struct byArea {
     }
 };
 
+//// First Time Box Ant ////
+void foot::firstTimeLowerBox(geoproy GeoProy){
+    cv::Point2f pin, pout;
+    pin.x = 0; pin.y = 0;
+    int w = 30, h = 40;
+
+    pout = GeoProy.transformFloor2Image(pin, GeoProy.homography);
+    frameAnt.segmLowerBox.x = int(pout.x) - w/2;
+    frameAnt.segmLowerBox.y = int(pout.y) - h;
+    frameAnt.segmLowerBox.width  = w;
+    frameAnt.segmLowerBox.height = h;
+
+}
+
 
 //// Grabacion 3 ////
 void foot::getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes) {
@@ -164,6 +178,8 @@ void foot::distanceFilterBoxes(){
     vector<Rect> vectorOut;
 
     vectorOut.clear();
+
+    //cv::rectangle(frameAct.processFrame, frameAnt.segmLowerBox, orange, 3);
 
     boxAntPoint.x = frameAnt.segmLowerBox.x + frameAnt.segmLowerBox.width/2;
     boxAntPoint.y = frameAnt.segmLowerBox.y + frameAnt.segmLowerBox.height/2;
@@ -229,7 +245,7 @@ void foot::findLowerBox(){
         }
     }
 
-    distFilterBoxesFlag = true;
+//    distFilterBoxesFlag = true;
 }
 
 void foot::getLowerBox() {
@@ -240,14 +256,12 @@ void foot::getLowerBox() {
     getBlobsBoxes(frameAct.labelsFrame, frameAct.segmLowerBoxes);
     orderVectorBoxes(frameAct.segmLowerBoxes, frameAct.segmLowerBoxesVector);
 
-    if (distFilterBoxesFlag)
-        distanceFilterBoxes();
+//    if (distFilterBoxesFlag)
+    distanceFilterBoxes();
 
     findLowerBox();
 
 }
-
-
 
 void foot::zoneDetectionG3(geoproy GeoProy){
 
@@ -776,6 +790,13 @@ void foot::askObjetives(geoproy GeoProy){
         stepPointL = geoproy::transformFloor2Image(frameAct.leftFoot, GeoProy.homographyInv);
         centerFlagIsIn = stepPointL.x > -60 && stepPointL.x < 60 && stepPointL.y > -60 && stepPointL.y < 60;
     }
+
+    if(!step_R && !step_L){
+        stepPointR = geoproy::transformFloor2Image(centerKalman_R, GeoProy.homographyInv);
+        stepPointL = geoproy::transformFloor2Image(centerKalman_L, GeoProy.homographyInv);
+        centerFlagIsIn = stepPointR.x > -50 && stepPointR.x < 50 && stepPointR.y > -50 && stepPointR.y < 50 &&
+                         stepPointL.x > -50 && stepPointL.x < 50 && stepPointL.y > -50 && stepPointL.y < 50;
+    }
 }
 
 void foot::centerOutCountFlag(geoproy GeoProy){
@@ -840,6 +861,10 @@ void foot::stateMachine(geoproy &GeoProy) {
 //                cout << "\n" << endl;
                 paint = true;
                 sequenceCount++;
+
+                if (sequenceCount == 10){
+                    stopFlagCenter = true;
+                }
             }
 
             logMatchingCenterFrame();
@@ -847,6 +872,14 @@ void foot::stateMachine(geoproy &GeoProy) {
 //                cout << "Next Target: " << GeoProy.objetivesG3[sequenceCount] << endl;
                 paintTarget = true;
             }
+
+            if (stopFlagCenter){
+                cout << "\n RUTINA TERMINADA " << endl;
+                logEndVideo();
+                stop = true;
+            }
+
+
 
         }
 
@@ -915,14 +948,8 @@ void foot::stateMachine(geoproy &GeoProy) {
     }
 
 
-
     if (sequenceCount == 10){
-        stopCount++;
-        if (stopCount == 20) {
-            cout << "\n RUTINA TERMINADA " << endl;
-            logEndVideo();
-            stop = true;
-        }
+        stopFlagCenter = true;
     }
 
 

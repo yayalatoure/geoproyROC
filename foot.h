@@ -75,6 +75,9 @@ class foot {
         //// Segmentation & ROI (footBoxes) ////
         void maskConvexPoly(geoproy GeoProy);
         void segmentation(cv::Ptr<cv::BackgroundSubtractorMOG2> mog);
+
+        void firstTimeLowerBox(geoproy GeoProy);
+
         void getBlobsBoxes(cv::Mat labels, std::map<int, cv::Rect> &bboxes);
         void orderVectorBoxes(std::map<int, cv::Rect> &bboxes, vector<Rect> &vectorBoxes);
         void distanceFilterBoxes();
@@ -155,7 +158,9 @@ class foot {
 
         //// Bool Atributes ////
         bool start = false;
+        bool stopFlagCenter = false;
         bool stop = false;
+        bool firstTimeLBFlag = true;
         bool found;
         bool distFilterBoxesFlag = false;
         bool Reset_R;
